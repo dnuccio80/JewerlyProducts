@@ -19,6 +19,8 @@ import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.Card
+import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
@@ -28,7 +30,6 @@ import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.key
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -38,8 +39,11 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.text.input.KeyboardType
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.compose.ui.window.Dialog
+import com.example.jewerlyproducts.ui.theme.Purple40
 import com.example.jewerlyproducts.ui.theme.Purple80
 
 @Composable
@@ -53,8 +57,8 @@ fun SecondTitleItem(text: String) {
 }
 
 @Composable
-fun BodyText(text: String, modifier: Modifier = Modifier) {
-    Text(text, modifier = modifier, fontSize = 14.sp, color = Color.White)
+fun BodyText(text: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
+    Text(text, modifier = modifier, fontSize = 14.sp, color = Color.White, textAlign = textAlign)
 }
 
 @Composable
@@ -80,8 +84,13 @@ fun ScreenBackgroundComponent(innerPadding: PaddingValues, content: @Composable 
 }
 
 @Composable
-fun FloatingButton(innerPadding: PaddingValues, onClick:() -> Unit) {
-    Box(Modifier.fillMaxSize().padding(bottom = innerPadding.calculateBottomPadding() + 32.dp, end = 16.dp), contentAlignment = Alignment.BottomEnd) {
+fun FloatingButton(innerPadding: PaddingValues, onClick: () -> Unit) {
+    Box(
+        Modifier
+            .fillMaxSize()
+            .padding(bottom = innerPadding.calculateBottomPadding() + 32.dp, end = 16.dp),
+        contentAlignment = Alignment.BottomEnd
+    ) {
         FloatingActionButton(
             onClick = { onClick() },
             containerColor = Color.Magenta,
@@ -93,8 +102,18 @@ fun FloatingButton(innerPadding: PaddingValues, onClick:() -> Unit) {
 }
 
 @Composable
-fun AcceptDeclineButtons(acceptText:String, declineText:String, onAccept:() -> Unit, onDecline:() -> Unit, enabled:Boolean = true ) {
-    Row(Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.SpaceEvenly) {
+fun AcceptDeclineButtons(
+    acceptText: String,
+    declineText: String,
+    onAccept: () -> Unit,
+    onDecline: () -> Unit,
+    enabled: Boolean = true
+) {
+    Row(
+        Modifier.fillMaxWidth(),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.SpaceEvenly
+    ) {
         Button(
             onClick = { onDecline() },
             colors = ButtonDefaults.buttonColors(
@@ -114,6 +133,49 @@ fun AcceptDeclineButtons(acceptText:String, declineText:String, onAccept:() -> U
         ) {
             BodyText(acceptText)
         }
+    }
+}
+
+@Composable
+fun ConfirmDialog(show: Boolean, text: String, onAccept: () -> Unit, onDismiss: () -> Unit) {
+
+    if (!show) return
+
+    Dialog(
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            shape = RoundedCornerShape(4.dp), colors = CardDefaults.cardColors(
+                containerColor = Purple40
+            )
+        ) {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(16.dp),
+                modifier = Modifier.padding(16.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                BodyText(text, textAlign = TextAlign.Center)
+                AcceptDeclineButtons(
+                    acceptText = "Confirmar",
+                    declineText = "Cancelar",
+                    onAccept = { onAccept() },
+                    onDecline = { onDismiss() },
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun SimpleButtonText(text: String, color: Color, onClick: () -> Unit) {
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = color
+        ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        BodyText(text)
     }
 }
 

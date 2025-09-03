@@ -23,13 +23,17 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.navigation.NavArgument
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.jewerlyproducts.ui.routes.Routes
 import com.example.jewerlyproducts.ui.screens.home.HomeScreen
-import com.example.jewerlyproducts.ui.screens.materialsDetails.AddNewMaterialScreen
+import com.example.jewerlyproducts.ui.screens.materialdetails.MaterialDetailsScreen
+import com.example.jewerlyproducts.ui.screens.newmaterial.AddNewMaterialScreen
 import com.example.jewerlyproducts.ui.screens.materialslist.MaterialsListScreen
 import com.example.jewerlyproducts.ui.screens.newproduct.AddNewProductScreen
 import com.example.jewerlyproducts.ui.screens.productslist.ProductsListScreen
@@ -119,12 +123,24 @@ class MainActivity : ComponentActivity() {
                         composable(Routes.MaterialList.routes) {
                             MaterialsListScreen(
                                 innerPadding,
-                                onNavigateToAddNewMaterial = { mainNav.navigate(Routes.AddNewMaterial.routes) })
+                                onNavigateToAddNewMaterial = { mainNav.navigate(Routes.AddNewMaterial.routes) },
+                                onNavigateToMaterialDetails = { materialId -> mainNav.navigate(Routes.MaterialDetail.createRoute(materialId)) }
+
+                            )
                         }
                         composable(Routes.AddNewMaterial.routes) {
                             AddNewMaterialScreen(
                                 innerPadding,
                                 onAddMaterial = {},
+                                onDismiss = { mainNav.popBackStack() }
+                            )
+                        }
+                        composable(Routes.MaterialDetail.routes, arguments = listOf(navArgument("materialId"){
+                            type = NavType.IntType
+                        })) { navBackStackEntry ->
+                            MaterialDetailsScreen(
+                                innerPadding = innerPadding,
+                                materialId = navBackStackEntry.arguments?.getInt("materialId") ?: 0,
                                 onDismiss = { mainNav.popBackStack() }
                             )
                         }

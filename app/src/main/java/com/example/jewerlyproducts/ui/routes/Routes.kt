@@ -6,6 +6,8 @@ sealed class Routes(val routes:String) {
     data object ProductDetail:Routes("ProductDetails")
     data object AddNewProduct:Routes("AddNewProduct")
     data object MaterialList:Routes("MaterialList")
-    data object MaterialDetail:Routes("MaterialDetail")
+    data object MaterialDetail:Routes("MaterialDetail/{materialId}") {
+        fun createRoute(materialId:Int) = "MaterialDetail/$materialId"
+    }
     data object AddNewMaterial:Routes("AddNewMaterial")
 }

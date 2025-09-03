@@ -13,10 +13,10 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Clear
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldColors
 import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -33,29 +33,31 @@ import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.theme.Purple40
 
 @Composable
-fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
+fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, onNavigateToMaterialDetails:(Int) -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
 
-    val listName by viewModel.searchName.collectAsState()
+    val searchQuery by viewModel.searchQuery.collectAsState()
+    val materialsList by viewModel.materialsList.collectAsState()
 
     ScreenBackgroundComponent(innerPadding) {
         FirstTitleItem("Listado de materiales")
         TextField(
-            value = listName,
-            onValueChange = { viewModel.updateSearchName(it) },
+            value = searchQuery,
+            onValueChange = { viewModel.updateQuery(it) },
             colors = TextFieldDefaults.colors(
                 focusedContainerColor = Color.DarkGray.copy(.2f),
                 unfocusedContainerColor = Color.Transparent
             ),
+            singleLine = true,
             modifier = Modifier.fillMaxWidth(),
             placeholder = { Text("Buscar por nombre..") },
             trailingIcon = {
-                if(listName.isNotBlank()) {
+                if(searchQuery.isNotBlank()) {
                     Icon(
                         Icons.Filled.Clear,
                         contentDescription = "clear data",
                         tint = Color.White,
                         modifier = Modifier.clickable {
-                            viewModel.updateSearchName("")
+                            viewModel.updateQuery("")
                         }
                     )
                 }
@@ -68,24 +70,32 @@ fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:(
                 .verticalScroll(rememberScrollState()),
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
-            MaterialItem()
+            if(materialsList.isNotEmpty()) {
+                materialsList.forEach {
+                    MaterialItem(
+                        name = it.name,
+                        unitPrice = it.unitPrice,
+                        quantityPerPack = it.quantityPerPack
+                    ) {
+                        onNavigateToMaterialDetails(it.id)
+                    }
+                }
+            } else {
+                SecondTitleItem("No hay nada para mostrar")
+            }
+
         }
     }
     FloatingButton(innerPadding) { onNavigateToAddNewMaterial() }
 }
 
 @Composable
-fun MaterialItem() {
+fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, onClick:() -> Unit) {
     Card(
         modifier = Modifier
-            .fillMaxWidth(),
+            .fillMaxWidth()
+            .clickable { onClick() }
+        ,
         shape = RoundedCornerShape(4.dp),
         colors = CardDefaults.cardColors(
             containerColor = Purple40
@@ -97,9 +107,12 @@ fun MaterialItem() {
                 .padding(16.dp),
             verticalArrangement = Arrangement.spacedBy(4.dp)
         ) {
-            SecondTitleItem("Perlas de metal")
-            BodyText("Precio por unidad: $40")
-            BodyText("Cantidad por bolsa: 40gr - 350 un.")
+            Column(Modifier.fillMaxWidth()) {
+                SecondTitleItem(name)
+                HorizontalDivider(Modifier.fillMaxWidth(), thickness = 2.dp, color = Color.White)
+            }
+            BodyText("Precio por unidad: $$unitPrice")
+            BodyText("Cantidad por pack: $quantityPerPack")
         }
     }
 }

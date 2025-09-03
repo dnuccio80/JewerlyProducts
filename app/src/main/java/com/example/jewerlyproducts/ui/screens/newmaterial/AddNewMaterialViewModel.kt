@@ -1,14 +1,21 @@
-package com.example.jewerlyproducts.ui.screens.materialsDetails
+package com.example.jewerlyproducts.ui.screens.newmaterial
 
 import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
+import com.example.jewerlyproducts.data.materials.MaterialsRepository
+import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.launch
 import javax.inject.Inject
 import kotlin.math.ceil
 
 @HiltViewModel
-class AddNewMaterialViewModel @Inject constructor():ViewModel() {
+class AddNewMaterialViewModel @Inject constructor(private val repository: MaterialsRepository):ViewModel() {
 
     private val _name = MutableStateFlow("")
     val name:StateFlow<String> =_name
@@ -49,6 +56,12 @@ class AddNewMaterialViewModel @Inject constructor():ViewModel() {
             return
         }
         _individualPrice.value = ceil(_price.value!!.toDouble() / _quantityPerPack.value!!).toInt()
+    }
+
+    fun addNewMaterial(newMaterial:MaterialsDataClass) {
+        viewModelScope.launch(Dispatchers.IO) {
+            repository.addMaterial(newMaterial)
+        }
     }
 
 }
