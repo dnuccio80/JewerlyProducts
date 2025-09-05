@@ -4,6 +4,7 @@ import android.app.Application
 import androidx.room.Room
 import com.example.jewerlyproducts.data.AppDatabase
 import com.example.jewerlyproducts.data.materials.MaterialsDao
+import com.example.jewerlyproducts.data.products.ProductsDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -30,6 +31,12 @@ object Module {
     @Singleton
     fun provideMaterialsDao(appDatabase: AppDatabase):MaterialsDao {
         return appDatabase.materialsDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideProductsDao(appDatabase: AppDatabase):ProductsDao {
+        return appDatabase.productsDao
     }
 
 }

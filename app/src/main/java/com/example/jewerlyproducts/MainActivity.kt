@@ -36,6 +36,7 @@ import com.example.jewerlyproducts.ui.screens.materialdetails.MaterialDetailsScr
 import com.example.jewerlyproducts.ui.screens.newmaterial.AddNewMaterialScreen
 import com.example.jewerlyproducts.ui.screens.materialslist.MaterialsListScreen
 import com.example.jewerlyproducts.ui.screens.newproduct.AddNewProductScreen
+import com.example.jewerlyproducts.ui.screens.productdetails.ProductDetailsScreen
 import com.example.jewerlyproducts.ui.screens.productslist.ProductsListScreen
 import com.example.jewerlyproducts.ui.theme.JewerlyProductsTheme
 import dagger.hilt.android.AndroidEntryPoint
@@ -111,7 +112,14 @@ class MainActivity : ComponentActivity() {
                         composable(Routes.ProductList.routes) {
                             ProductsListScreen(
                                 innerPadding,
-                                onNavigateToNewProduct = { mainNav.navigate(Routes.AddNewProduct.routes) })
+                                onNavigateToNewProduct = { mainNav.navigate(Routes.AddNewProduct.routes) },
+                                onNavigateToDetails = { productId ->
+                                    mainNav.navigate(
+                                        Routes.ProductDetails.createRoute(productId)
+                                    )
+                                }
+
+                            )
                         }
                         composable(Routes.AddNewProduct.routes) {
                             AddNewProductScreen(
@@ -124,7 +132,11 @@ class MainActivity : ComponentActivity() {
                             MaterialsListScreen(
                                 innerPadding,
                                 onNavigateToAddNewMaterial = { mainNav.navigate(Routes.AddNewMaterial.routes) },
-                                onNavigateToMaterialDetails = { materialId -> mainNav.navigate(Routes.MaterialDetail.createRoute(materialId)) }
+                                onNavigateToMaterialDetails = { materialId ->
+                                    mainNav.navigate(
+                                        Routes.MaterialDetail.createRoute(materialId)
+                                    )
+                                }
 
                             )
                         }
@@ -135,14 +147,28 @@ class MainActivity : ComponentActivity() {
                                 onDismiss = { mainNav.popBackStack() }
                             )
                         }
-                        composable(Routes.MaterialDetail.routes, arguments = listOf(navArgument("materialId"){
-                            type = NavType.IntType
-                        })) { navBackStackEntry ->
+                        composable(
+                            Routes.MaterialDetail.routes,
+                            arguments = listOf(navArgument("materialId") {
+                                type = NavType.IntType
+                            })
+                        ) { navBackStackEntry ->
                             MaterialDetailsScreen(
                                 innerPadding = innerPadding,
                                 materialId = navBackStackEntry.arguments?.getInt("materialId") ?: 0,
                                 onDismiss = { mainNav.popBackStack() }
                             )
+                        }
+                        composable(
+                            Routes.ProductDetails.routes,
+                            arguments = listOf(navArgument("productId") {
+                                type = NavType.IntType
+                            })
+                        ) { navBackStackEntry ->
+                            ProductDetailsScreen(
+                                innerPadding = innerPadding,
+                                productId = navBackStackEntry.arguments?.getInt("productId") ?: 0,
+                            ) { mainNav.popBackStack() }
                         }
                     }
                 }

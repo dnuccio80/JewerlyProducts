@@ -24,6 +24,7 @@ import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
+import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
@@ -43,6 +44,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
+import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
+import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import com.example.jewerlyproducts.ui.theme.Purple40
 import com.example.jewerlyproducts.ui.theme.Purple80
 
@@ -244,7 +247,7 @@ fun TextFieldAreaItem(
 }
 
 @Composable
-fun TextFieldWithDropdownMenu(placeholder: String, value: String, onValueChange: (String) -> Unit) {
+fun TextFieldWithDropdownMenu(itemList:List<Any>, placeholder: String, value: String, onValueChange: (String) -> Unit) {
 
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -278,62 +281,77 @@ fun TextFieldWithDropdownMenu(placeholder: String, value: String, onValueChange:
             containerColor = Purple80,
             modifier = Modifier.heightIn(min = 60.dp, max = 150.dp)
         ) {
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 1")
-                    showMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 2")
+            itemList.forEach {
+                when(it) {
+                    is MaterialsDataClass -> {
+                        DropdownMenuItem(
+                            text = { BodyText(it.name) },
+                            onClick = {
+                                onValueChange(it.name)
+                                showMenu = false
+                            }
+                        )
+                    }
+                    is ProductsDataClass -> {
 
-                    showMenu = false
+                    }
                 }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 3")
-
-                    showMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 4")
-
-                    showMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 5")
-                    showMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 6")
-                    showMenu = false
-                }
-            )
-            DropdownMenuItem(
-                text = { BodyText("Prueba") },
-                onClick = {
-                    onValueChange("prueba 7")
-                    showMenu = false
-                }
-            )
-
+            }
         }
     }
 
+}
+
+@Composable
+fun DialogWithListAndQuantity(
+    show: Boolean,
+    title: String,
+    itemList:List<Any>,
+    quantitySell: String,
+    onQuantitySellChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onAccept: () -> Unit
+) {
+    if (!show) return
+
+    var articleName by rememberSaveable { mutableStateOf("") }
+
+    Dialog(
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Purple40
+            ),
+            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier.fillMaxWidth().padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    SecondTitleItem(title)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                }
+                TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { articleName = it }
+                NumericTextField(
+                    value = quantitySell,
+                    label = "Cantidad"
+                ) { onQuantitySellChange(it) }
+                AcceptDeclineButtons(
+                    acceptText = "Agregar",
+                    declineText = "Cancelar",
+                    onAccept = {
+                        onAccept()
+                        onDismiss()
+                    },
+                    onDecline = { onDismiss() },
+                    enabled = (articleName.isNotBlank() && quantitySell.isNotBlank())
+                )
+            }
+        }
+    }
 }
 
 

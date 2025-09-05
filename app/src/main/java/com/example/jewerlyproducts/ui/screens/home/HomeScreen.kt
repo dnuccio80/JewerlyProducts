@@ -1,7 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.home
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -11,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
@@ -19,7 +17,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
-import androidx.compose.material.icons.filled.ArrowDropDown
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -28,8 +25,6 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
-import androidx.compose.material3.TextField
-import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -46,14 +41,13 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.jewerlyproducts.ui.components.AcceptDeclineButtons
 import com.example.jewerlyproducts.ui.components.BodyText
+import com.example.jewerlyproducts.ui.components.DialogWithListAndQuantity
 import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.NumericTextField
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.components.SingleLineTextFieldItem
-import com.example.jewerlyproducts.ui.components.TextFieldWithDropdownMenu
 import com.example.jewerlyproducts.ui.theme.Purple40
-import com.example.jewerlyproducts.ui.theme.Purple80
 
 @Composable
 fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
@@ -79,9 +73,10 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
         )
     }
     // Sell Dialog
-    SellDialog(
+    DialogWithListAndQuantity(
         showSellDialog,
         "Agregar Venta",
+        itemList = emptyList(),
         quantitySell,
         onQuantitySellChange = { viewModel.updateQuantitySell(it) },
         onDismiss = {
@@ -164,61 +159,6 @@ fun ExpensesDialog(
         }
     }
 }
-
-
-@Composable
-fun SellDialog(
-    show: Boolean,
-    title: String,
-    quantitySell: String,
-    onQuantitySellChange: (String) -> Unit,
-    onDismiss: () -> Unit,
-    onAccept: () -> Unit
-) {
-    if (!show) return
-
-    var articleName by rememberSaveable { mutableStateOf("") }
-
-    Dialog(
-        onDismissRequest = { onDismiss() }
-    ) {
-        Card(
-            colors = CardDefaults.cardColors(
-                containerColor = Purple40
-            ),
-            shape = RoundedCornerShape(4.dp),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
-        ) {
-            Column(
-                modifier = Modifier.padding(16.dp),
-                verticalArrangement = Arrangement.spacedBy(16.dp)
-            ) {
-                Column {
-                    SecondTitleItem(title)
-                    HorizontalDivider(thickness = 2.dp, color = Color.White)
-                }
-                TextFieldWithDropdownMenu("Articulo", articleName) { articleName = it }
-                NumericTextField(
-                    value = quantitySell,
-                    label = "Cantidad"
-                ) { onQuantitySellChange(it) }
-                AcceptDeclineButtons(
-                    acceptText = "Agregar",
-                    declineText = "Cancelar",
-                    onAccept = {
-                        onAccept()
-                        onDismiss()
-                    },
-                    onDecline = { onDismiss() },
-                    enabled = (articleName.isNotBlank() && quantitySell.isNotBlank())
-                )
-            }
-        }
-    }
-}
-
-
-
 
 @Composable
 fun HomeFabItem(

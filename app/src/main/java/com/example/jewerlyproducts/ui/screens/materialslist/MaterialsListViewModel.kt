@@ -21,16 +21,6 @@ class MaterialsListViewModel @Inject constructor(
     getMaterialsUseCase: GetMaterialsUseCase
 ):ViewModel() {
 
-//    private val _searchName = MutableStateFlow("")
-//    val searchName:StateFlow<String> = _searchName
-//
-//
-
-//    private val _materialsList = repository.getAllMaterials().stateIn(
-//        viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList()
-//    )
-//    val materialsList: StateFlow<List<MaterialsDataClass>> = _materialsList
-
     private val _searchQuery = MutableStateFlow("")
     val searchQuery: StateFlow<String> = _searchQuery
 
@@ -42,10 +32,6 @@ class MaterialsListViewModel @Inject constructor(
         }
         .stateIn(viewModelScope, SharingStarted.WhileSubscribed(5000), emptyList())
     val materialsList = _materialsList
-
-//    fun updateSearchName(newValue: String) {
-//        _searchName.value = newValue
-//    }
 
     fun updateQuery(newValue:String) {
         _searchQuery.value = newValue

@@ -11,7 +11,7 @@ class MaterialsRepository @Inject constructor(private val materialsDao: Material
 
     fun getAllMaterials(): Flow<List<MaterialsDataClass>> = materialsDao.getAllMaterials().map { list ->
         list.sortedBy {
-            it.name
+            it.name.lowercase()
         }.map {entity ->
             entity.toDataClass()
         }
