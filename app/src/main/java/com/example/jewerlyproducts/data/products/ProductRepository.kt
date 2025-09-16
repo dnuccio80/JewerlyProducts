@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.data.products
 
+import com.example.jewerlyproducts.data.relations.ProductMaterialsCrossRef
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
@@ -11,14 +12,14 @@ class ProductRepository @Inject constructor(private val productDao: ProductsDao)
         productDao.addProduct(product.toEntity())
     }
 
-    fun getProductById(productId:Int):ProductsDataClass {
-        return productDao.getProductById(productId).toDataClass()
+    fun getProductById(productName:String):ProductsDataClass {
+        return productDao.getProductById(productName).toDataClass()
     }
 
     fun getAllProducts(): Flow<List<ProductsDataClass>> {
         return productDao.getAllProducts().map { list ->
             list.sortedBy {
-                it.name.lowercase()
+                it.productName.lowercase()
             }.map {entity ->
                 entity.toDataClass()
             }
@@ -29,8 +30,20 @@ class ProductRepository @Inject constructor(private val productDao: ProductsDao)
         productDao.updateProduct(product.toEntity())
     }
 
-    fun deleteProduct(productId: Int) {
-        productDao.deleteProduct(productId)
+    fun deleteProduct(productName: String) {
+        productDao.deleteProduct(productName)
     }
+
+    suspend fun addProductMaterialCrossRef(crossRef:ProductMaterialsCrossRef) {
+        productDao.addProductMaterialsCrossRef(crossRef)
+    }
+
+    suspend fun deleteProductMaterialCrossRef(productName:String) {
+        productDao.deleteProductMaterialCrossRef(productName)
+    }
+
+//    suspend fun getProductWithMaterials(productId: Int):ProductWithMaterials {
+//       return productDao.getProductWithMaterials(productId)
+//    }
 
 }

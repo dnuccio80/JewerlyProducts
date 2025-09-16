@@ -33,7 +33,7 @@ import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.theme.Purple40
 
 @Composable
-fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, onNavigateToMaterialDetails:(Int) -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
+fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, onNavigateToMaterialDetails:(String) -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
 
     val searchQuery by viewModel.searchQuery.collectAsState()
     val materialsList by viewModel.materialsList.collectAsState()
@@ -71,13 +71,16 @@ fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if(materialsList.isNotEmpty()) {
-                materialsList.forEach {
+                materialsList.forEach {material ->
                     MaterialItem(
-                        name = it.name,
-                        unitPrice = it.unitPrice,
-                        quantityPerPack = it.quantityPerPack
+                        name = material.materialName,
+                        unitPrice = viewModel.getUnitPrice(
+                            packValue = material.pricePerPack,
+                            quantityPerPack = material.quantityPerPack
+                        ),
+                        quantityPerPack = material.quantityPerPack
                     ) {
-                        onNavigateToMaterialDetails(it.id)
+                        onNavigateToMaterialDetails(material.materialName)
                     }
                 }
             } else {

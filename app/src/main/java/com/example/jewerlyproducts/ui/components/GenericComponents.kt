@@ -45,6 +45,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.window.Dialog
 import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
+import com.example.jewerlyproducts.ui.dataclasses.MaterialsSaver
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import com.example.jewerlyproducts.ui.theme.Purple40
 import com.example.jewerlyproducts.ui.theme.Purple80
@@ -60,8 +61,8 @@ fun SecondTitleItem(text: String) {
 }
 
 @Composable
-fun BodyText(text: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start) {
-    Text(text, modifier = modifier, fontSize = 14.sp, color = Color.White, textAlign = textAlign)
+fun BodyText(text: String, modifier: Modifier = Modifier, textAlign: TextAlign = TextAlign.Start, color: Color = Color.White) {
+    Text(text, modifier = modifier, fontSize = 14.sp, color = color, textAlign = textAlign)
 }
 
 @Composable
@@ -186,6 +187,7 @@ fun SimpleButtonText(text: String, color: Color, onClick: () -> Unit) {
 fun SingleLineTextFieldItem(
     value: String,
     label: String,
+    enabled:Boolean = true,
     onValueChange: (String) -> Unit,
 ) {
     TextField(
@@ -195,10 +197,12 @@ fun SingleLineTextFieldItem(
         modifier = Modifier.fillMaxWidth(),
         colors = TextFieldDefaults.colors(
             unfocusedContainerColor = Color.Transparent,
-            focusedContainerColor = Color.DarkGray.copy(alpha = .2f)
+            focusedContainerColor = Color.DarkGray.copy(alpha = .2f),
+            disabledContainerColor = Color.Transparent
         ),
         keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
         singleLine = true,
+        enabled = enabled
     )
 }
 
@@ -247,7 +251,12 @@ fun TextFieldAreaItem(
 }
 
 @Composable
-fun TextFieldWithDropdownMenu(itemList:List<Any>, placeholder: String, value: String, onValueChange: (String) -> Unit) {
+fun TextFieldWithDropdownMenu(
+    itemList: List<Any>,
+    placeholder: String,
+    value: String,
+    onValueChange: (Any) -> Unit
+) {
 
     var showMenu by rememberSaveable { mutableStateOf(false) }
 
@@ -282,16 +291,17 @@ fun TextFieldWithDropdownMenu(itemList:List<Any>, placeholder: String, value: St
             modifier = Modifier.heightIn(min = 60.dp, max = 150.dp)
         ) {
             itemList.forEach {
-                when(it) {
+                when (it) {
                     is MaterialsDataClass -> {
                         DropdownMenuItem(
-                            text = { BodyText(it.name) },
+                            text = { BodyText(it.materialName) },
                             onClick = {
-                                onValueChange(it.name)
+                                onValueChange(it)
                                 showMenu = false
                             }
                         )
                     }
+
                     is ProductsDataClass -> {
 
                     }
@@ -306,15 +316,26 @@ fun TextFieldWithDropdownMenu(itemList:List<Any>, placeholder: String, value: St
 fun DialogWithListAndQuantity(
     show: Boolean,
     title: String,
-    itemList:List<Any>,
+    itemList: List<Any>,
     quantitySell: String,
     onQuantitySellChange: (String) -> Unit,
     onDismiss: () -> Unit,
-    onAccept: () -> Unit
+    onAccept: (MaterialsDataClass, Int) -> Unit
 ) {
     if (!show) return
 
+
     var articleName by rememberSaveable { mutableStateOf("") }
+    val materialSelected = rememberSaveable(saver = MaterialsSaver) {
+        mutableStateOf(
+            MaterialsDataClass(
+                materialName = "",
+                quantityPerPack = 0,
+                pricePerPack = 0,
+                annotations = ""
+            )
+        )
+    }
 
     Dialog(
         onDismissRequest = { onDismiss() }
@@ -324,7 +345,9 @@ fun DialogWithListAndQuantity(
                 containerColor = Purple40
             ),
             shape = RoundedCornerShape(4.dp),
-            modifier = Modifier.fillMaxWidth().padding(16.dp)
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -334,7 +357,14 @@ fun DialogWithListAndQuantity(
                     SecondTitleItem(title)
                     HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
-                TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { articleName = it }
+                TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { item ->
+                    when (item) {
+                        is MaterialsDataClass -> {
+                            articleName = item.materialName
+                            materialSelected.value = item
+                        }
+                    }
+                }
                 NumericTextField(
                     value = quantitySell,
                     label = "Cantidad"
@@ -343,7 +373,7 @@ fun DialogWithListAndQuantity(
                     acceptText = "Agregar",
                     declineText = "Cancelar",
                     onAccept = {
-                        onAccept()
+                        onAccept(materialSelected.value, quantitySell.toInt())
                         onDismiss()
                     },
                     onDecline = { onDismiss() },

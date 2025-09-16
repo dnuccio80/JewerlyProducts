@@ -35,17 +35,17 @@ import com.example.jewerlyproducts.ui.components.TextFieldAreaItem
 @Composable
 fun MaterialDetailsScreen(
     innerPadding: PaddingValues,
-    materialId: Int,
+    materialName: String,
     viewModel: MaterialDetailsViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
 
     LaunchedEffect(true) {
-        viewModel.getMaterialById(materialId)
+        viewModel.getMaterialByName(materialName)
     }
 
     val materialDetails by viewModel.materialDetails.collectAsState()
-    val materialName by viewModel.materialName.collectAsState()
+//    val materialName by viewModel.materialName.collectAsState()
     val materialPrice by viewModel.materialPrice.collectAsState()
     val quantityPerPack by viewModel.quantityPerPack.collectAsState()
     val annotations by viewModel.annotations.collectAsState()
@@ -111,7 +111,7 @@ fun MaterialDetailsScreen(
                     onDecline = { onDismiss() },
                     onAccept = {
                         // Update on Room and back
-                        viewModel.updateMaterial(materialId)
+                        viewModel.updateMaterial(materialName)
                         onDismiss()
                     },
                     enabled = enabledButton
@@ -124,7 +124,7 @@ fun MaterialDetailsScreen(
                 show = showConfirmDialog,
                 text = "¿Estás segura que queres eliminar el material?",
                 onAccept = {
-                    viewModel.deleteMaterialById(materialId)
+                    viewModel.deleteMaterialById(materialName)
                     showConfirmDialog = false
                     onDismiss()
                 },

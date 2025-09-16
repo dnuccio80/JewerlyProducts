@@ -37,4 +37,6 @@ class MaterialsListViewModel @Inject constructor(
         _searchQuery.value = newValue
     }
 
+    fun getUnitPrice(packValue:Int, quantityPerPack:Int):Int = packValue/quantityPerPack
+
 }

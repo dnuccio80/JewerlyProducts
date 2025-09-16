@@ -95,11 +95,10 @@ fun AddNewMaterialScreen(
                         // Add on Room and back
                         viewModel.addNewMaterial(
                             MaterialsDataClass(
-                                name = materialName,
+                                materialName = materialName,
                                 pricePerPack = materialPrice!!.toInt(),
                                 quantityPerPack = quantityPerPack!!.toInt(),
                                 annotations = annotations,
-                                unitPrice = individualPrice!!.toInt(),
                             )
                         )
                         onDismiss()

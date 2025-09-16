@@ -5,11 +5,12 @@ sealed class Routes(val routes:String) {
     data object ProductList:Routes("ProductList")
     data object AddNewProduct:Routes("AddNewProduct")
     data object MaterialList:Routes("MaterialList")
-    data object MaterialDetail:Routes("MaterialDetail/{materialId}") {
-        fun createRoute(materialId:Int) = "MaterialDetail/$materialId"
+    data object MaterialDetail:Routes("MaterialDetail/{materialName}") {
+        fun createRoute(materialName:String) = "MaterialDetail/$materialName"
     }
-    data object ProductDetails:Routes("ProductDetails/{productId}") {
-        fun createRoute(productId:Int) = "ProductDetails/$productId"
+    data object ProductDetails:Routes("ProductDetails/{productName}") {
+        fun createRoute(productName:String) = "ProductDetails/$productName"
     }
     data object AddNewMaterial:Routes("AddNewMaterial")
+    data object ProductMaterials:Routes("productMaterials")
 }

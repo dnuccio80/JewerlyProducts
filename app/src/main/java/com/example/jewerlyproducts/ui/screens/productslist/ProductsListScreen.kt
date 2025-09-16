@@ -1,11 +1,7 @@
 package com.example.jewerlyproducts.ui.screens.productslist
 
-import android.net.Uri
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -22,8 +18,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -44,7 +38,7 @@ fun ProductsListScreen(
     innerPadding: PaddingValues,
     onNavigateToNewProduct: () -> Unit,
     viewModel: ProductsListViewModel = hiltViewModel(),
-    onNavigateToDetails: (Int) -> Unit
+    onNavigateToDetails: (String) -> Unit
 ) {
 
     val productsList by viewModel.productList.collectAsState()
@@ -64,7 +58,7 @@ fun ProductsListScreen(
                 SecondTitleItem("No hay nada para mostrar")
             } else {
                 productsList.forEach { product ->
-                    ProductItem(product) { onNavigateToDetails(product.id) }
+                    ProductItem(product) { onNavigateToDetails(product.productName) }
                 }
             }
         }
@@ -106,8 +100,7 @@ fun ProductItem(product: ProductsDataClass, onNavigateToDetails: () -> Unit) {
                 verticalArrangement = Arrangement.SpaceEvenly,
                 modifier = Modifier.weight(1f)
             ) {
-                SecondTitleItem(product.name)
-                BodyText("Costo: $${product.cost}")
+                SecondTitleItem(product.productName)
                 BodyText("Valor de venta: ${product.sellValue}")
             }
         }

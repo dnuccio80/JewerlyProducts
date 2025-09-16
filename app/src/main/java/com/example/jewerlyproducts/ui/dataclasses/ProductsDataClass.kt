@@ -1,20 +1,15 @@
 package com.example.jewerlyproducts.ui.dataclasses
 
 import com.example.jewerlyproducts.data.products.ProductsEntity
-import kotlin.math.cos
 
 data class ProductsDataClass(
-    val id:Int = 0,
-    val name:String,
-    val cost:Int,
+    val productName:String,
     val sellValue:Int,
     val imageUri:String = ""
 ) {
     fun toEntity():ProductsEntity {
         return  ProductsEntity(
-            id = id,
-            name = name,
-            cost = cost,
+            productName = productName,
             sellValue = sellValue,
             imageUri = imageUri
         )

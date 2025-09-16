@@ -82,20 +82,21 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
         onDismiss = {
             viewModel.updateShowSellDialog(false)
             viewModel.clearSellStats()
+        },
+        onAccept = { material, quantity ->
+            viewModel.updateShowSellDialog(
+                false
+            )
         }
     )
-    {
-        viewModel.updateShowSellDialog(
-            false
-        )
-    }
+
     ExpensesDialog(
         showExpensesDialog,
         expensesDescription,
         price = expensesPrice,
         onDescriptionChange = { viewModel.updateExpensesDescription(it) },
         onPriceChange = { viewModel.updateExpensesPrice(it) },
-        onAddExpenses = {  }
+        onAddExpenses = { }
     ) {
         viewModel.updateShowAddExpensesDialog(
             false

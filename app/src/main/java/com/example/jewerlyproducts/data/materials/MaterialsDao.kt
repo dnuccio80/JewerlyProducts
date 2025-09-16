@@ -1,7 +1,6 @@
 package com.example.jewerlyproducts.data.materials
 
 import androidx.room.Dao
-import androidx.room.Delete
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
@@ -14,17 +13,17 @@ interface MaterialsDao {
     @Query("SELECT * FROM MATERIALSENTITY")
     fun getAllMaterials(): Flow<List<MaterialsEntity>>
 
-    @Query("SELECT * FROM MaterialsEntity WHERE name LIKE '%' || :query || '%'")
+    @Query("SELECT * FROM MaterialsEntity WHERE materialName LIKE '%' || :query || '%'")
     fun getWorkByDescription(query: String): Flow<List<MaterialsEntity>>
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     fun addMaterial(materialsEntity: MaterialsEntity)
 
-    @Query("SELECT * FROM MATERIALSENTITY WHERE id = :materialId")
-    suspend fun getMaterialById(materialId:Int): MaterialsEntity
+    @Query("SELECT * FROM MATERIALSENTITY WHERE materialName = :materialName")
+    suspend fun getMaterialByName(materialName:String): MaterialsEntity
 
-    @Query("DELETE FROM MATERIALSENTITY WHERE id = :materialId")
-    fun deleteMaterialById(materialId: Int)
+    @Query("DELETE FROM MATERIALSENTITY WHERE materialName = :materialName")
+    fun deleteMaterialByName(materialName: String)
 
     @Update
     suspend fun updateMaterial(material: MaterialsEntity)

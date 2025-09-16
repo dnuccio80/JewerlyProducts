@@ -42,14 +42,18 @@ class ProductDetailsViewModel @Inject constructor(private val repository: Produc
     private val _materialQuantity = MutableStateFlow("")
     val materialQuantity: StateFlow<String> = _materialQuantity
 
+    // TESTING
+    /* HERE WE HAVE TO PUT THE LIST OF MATERIALS IN PRODUCTS THROW
+    *  THE PRODUCTDAO QUERY */
 
-    fun getProductById(productId:Int) {
+
+
+    fun getProductByName(productName:String) {
         viewModelScope.launch(Dispatchers.IO) {
             async {
-                _productDetails.value = repository.getProductById(productId)
+                _productDetails.value = repository.getProductById(productName)
             }.await()
-            _productName.value = _productDetails.value!!.name
-            _costValue.value = _productDetails.value!!.cost.toString()
+            _productName.value = _productDetails.value!!.productName
             _sellValue.value = _productDetails.value!!.sellValue.toString()
             _productImageUri.value = _productDetails.value!!.imageUri
         }
@@ -85,10 +89,14 @@ class ProductDetailsViewModel @Inject constructor(private val repository: Produc
         }
     }
 
-    fun deleteProduct(productId: Int) {
+    fun deleteProduct(productName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteProduct(productId)
+            repository.deleteProduct(productName)
         }
+    }
+
+    fun isSellValueGreaterThanCostValue():Boolean {
+        return _sellValue.value.toInt() > _costValue.value.toInt()
     }
 
 

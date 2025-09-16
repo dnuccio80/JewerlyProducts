@@ -6,19 +6,15 @@ import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
 
 @Entity
 data class MaterialsEntity(
-    @PrimaryKey (autoGenerate = true)
-    val id:Int = 0,
-    val name:String,
-    val unitPrice:Int,
+    @PrimaryKey (autoGenerate = false)
+    val materialName:String,
     val pricePerPack:Int,
     val quantityPerPack:Int,
     val annotations:String
 ) {
     fun toDataClass():MaterialsDataClass {
         return MaterialsDataClass(
-            id = id,
-            name = name,
-            unitPrice = unitPrice,
+            materialName = materialName,
             pricePerPack = pricePerPack,
             quantityPerPack = quantityPerPack,
             annotations = annotations

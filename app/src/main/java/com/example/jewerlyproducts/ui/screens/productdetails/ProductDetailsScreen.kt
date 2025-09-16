@@ -1,6 +1,7 @@
 package com.example.jewerlyproducts.ui.screens.productdetails
 
 import android.net.Uri
+import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Arrangement
@@ -36,6 +37,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
@@ -57,17 +59,19 @@ import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 @Composable
 fun ProductDetailsScreen(
     innerPadding: PaddingValues,
-    productId: Int,
+    productName: String,
     viewModel: ProductDetailsViewModel = hiltViewModel(),
     onDismiss: () -> Unit
 ) {
 
     LaunchedEffect(true) {
-        viewModel.getProductById(productId)
+        viewModel.getProductByName(productName)
     }
 
+    val context = LocalContext.current
+
     val productDetails by viewModel.productDetails.collectAsState()
-    val productName by viewModel.productName.collectAsState()
+//    val productName by viewModel.productName.collectAsState()
     val showMaterialDialog by viewModel.showMaterialDialog.collectAsState()
     val costValue by viewModel.costValue.collectAsState()
     val sellValue by viewModel.sellValue.collectAsState()
@@ -104,7 +108,9 @@ fun ProductDetailsScreen(
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Row(
-                    Modifier.fillMaxWidth().padding(top = 16.dp),
+                    Modifier
+                        .fillMaxWidth()
+                        .padding(top = 16.dp),
                     verticalAlignment = Alignment.CenterVertically,
                     horizontalArrangement = Arrangement.SpaceEvenly
                 ) {
@@ -207,16 +213,19 @@ fun ProductDetailsScreen(
                     acceptText = "Modificar producto",
                     declineText = "Cancelar",
                     onAccept = {
-                        viewModel.updateProduct(
-                            ProductsDataClass(
-                                id = productId,
-                                name = productName,
-                                cost = costValue.toInt(),
-                                sellValue = sellValue.toInt(),
-                                imageUri = productImageUri,
+                        if(viewModel.isSellValueGreaterThanCostValue()) {
+                            viewModel.updateProduct(
+                                ProductsDataClass(
+                                    productName = productName,
+                                    sellValue = sellValue.toInt(),
+                                    imageUri = productImageUri,
+                                )
                             )
-                        )
-                        onDismiss()
+                            onDismiss()
+                        } else {
+                            Toast.makeText(context, "El valor de venta tiene que ser superior a el costo del producto!", Toast.LENGTH_SHORT).show()
+                        }
+
                     },
                     onDecline = { onDismiss() },
                     enabled = productName.isNotBlank() && sellValue.isNotBlank()
@@ -232,13 +241,13 @@ fun ProductDetailsScreen(
                         viewModel.updateShowMaterialDialog(false)
                         viewModel.clearMaterialStats()
                     },
-                    onAccept = { }
+                    onAccept = { material, quantity -> }
                 )
                 ConfirmDialog(
                     show = showConfirmDialog,
                     text = "Segura que queres eliminar el producto?",
                     onAccept = {
-                        viewModel.deleteProduct(productId)
+                        viewModel.deleteProduct(productName)
                         showConfirmDialog = false
                         onDismiss()
                     }

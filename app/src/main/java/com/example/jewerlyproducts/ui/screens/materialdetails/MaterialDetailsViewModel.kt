@@ -34,12 +34,12 @@ class MaterialDetailsViewModel @Inject constructor(private val repository: Mater
     private val _individualPrice = MutableStateFlow<Int?>(null)
     val individualPrice:StateFlow<Int?> = _individualPrice
 
-    fun getMaterialById(materialId: Int) {
+    fun getMaterialByName(materialName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             async {
-                _materialDetails.value = repository.getMaterialById(materialId)
+                _materialDetails.value = repository.getMaterialByName(materialName)
             }.await()
-            _materialName.value = _materialDetails.value?.name.orEmpty()
+            _materialName.value = _materialDetails.value?.materialName.orEmpty()
             _materialPrice.value = _materialDetails.value?.pricePerPack
             _quantityPerPack.value = _materialDetails.value?.quantityPerPack
             _annotations.value = _materialDetails.value?.annotations.orEmpty()
@@ -72,13 +72,11 @@ class MaterialDetailsViewModel @Inject constructor(private val repository: Mater
         _individualPrice.value = ceil(_materialPrice.value!!.toDouble() / _quantityPerPack.value!!).toInt()
     }
 
-    fun updateMaterial(materialId: Int) {
+    fun updateMaterial(materialName: String) {
         viewModelScope.launch(Dispatchers.IO) {
             repository.updateMaterial(
                 MaterialsDataClass(
-                    id = materialId,
-                    name = materialName.value,
-                    unitPrice = individualPrice.value!!,
+                    materialName = this@MaterialDetailsViewModel.materialName.value,
                     quantityPerPack = quantityPerPack.value!!,
                     pricePerPack = materialPrice.value!!,
                     annotations = annotations.value
@@ -87,9 +85,9 @@ class MaterialDetailsViewModel @Inject constructor(private val repository: Mater
         }
     }
 
-    fun deleteMaterialById(materialId:Int) {
+    fun deleteMaterialById(materialName: String) {
         viewModelScope.launch(Dispatchers.IO) {
-            repository.deleteMaterial(materialId)
+            repository.deleteMaterial(materialName)
         }
     }
 

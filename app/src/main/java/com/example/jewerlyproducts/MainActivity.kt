@@ -38,6 +38,7 @@ import com.example.jewerlyproducts.ui.screens.materialslist.MaterialsListScreen
 import com.example.jewerlyproducts.ui.screens.newproduct.AddNewProductScreen
 import com.example.jewerlyproducts.ui.screens.productdetails.ProductDetailsScreen
 import com.example.jewerlyproducts.ui.screens.productslist.ProductsListScreen
+import com.example.jewerlyproducts.ui.screens.testing.ProductMaterialsCrossRefScreen
 import com.example.jewerlyproducts.ui.theme.JewerlyProductsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -71,7 +72,7 @@ class MainActivity : ComponentActivity() {
                         BottomBar(currentTarget) { action ->
                             when (action) {
                                 BottomBarNavAction.HOME -> {
-                                    mainNav.navigate(Routes.Home.routes) {
+                                    mainNav.navigate(Routes.ProductMaterials.routes) {
                                         popUpTo(mainNav.graph.startDestinationId) {
                                             saveState = true
                                         }
@@ -106,16 +107,16 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = mainNav,
-                        startDestination = Routes.Home.routes
+                        startDestination = Routes.ProductMaterials.routes
                     ) {
                         composable(Routes.Home.routes) { HomeScreen(innerPadding) }
                         composable(Routes.ProductList.routes) {
                             ProductsListScreen(
                                 innerPadding,
                                 onNavigateToNewProduct = { mainNav.navigate(Routes.AddNewProduct.routes) },
-                                onNavigateToDetails = { productId ->
+                                onNavigateToDetails = { productName ->
                                     mainNav.navigate(
-                                        Routes.ProductDetails.createRoute(productId)
+                                        Routes.ProductDetails.createRoute(productName)
                                     )
                                 }
 
@@ -132,9 +133,9 @@ class MainActivity : ComponentActivity() {
                             MaterialsListScreen(
                                 innerPadding,
                                 onNavigateToAddNewMaterial = { mainNav.navigate(Routes.AddNewMaterial.routes) },
-                                onNavigateToMaterialDetails = { materialId ->
+                                onNavigateToMaterialDetails = { materialName ->
                                     mainNav.navigate(
-                                        Routes.MaterialDetail.createRoute(materialId)
+                                        Routes.MaterialDetail.createRoute(materialName)
                                     )
                                 }
 
@@ -149,27 +150,28 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(
                             Routes.MaterialDetail.routes,
-                            arguments = listOf(navArgument("materialId") {
-                                type = NavType.IntType
+                            arguments = listOf(navArgument("materialName") {
+                                type = NavType.StringType
                             })
                         ) { navBackStackEntry ->
                             MaterialDetailsScreen(
                                 innerPadding = innerPadding,
-                                materialId = navBackStackEntry.arguments?.getInt("materialId") ?: 0,
+                                materialName = navBackStackEntry.arguments?.getString("materialName").orEmpty(),
                                 onDismiss = { mainNav.popBackStack() }
                             )
                         }
                         composable(
                             Routes.ProductDetails.routes,
-                            arguments = listOf(navArgument("productId") {
-                                type = NavType.IntType
+                            arguments = listOf(navArgument("productName") {
+                                type = NavType.StringType
                             })
                         ) { navBackStackEntry ->
                             ProductDetailsScreen(
                                 innerPadding = innerPadding,
-                                productId = navBackStackEntry.arguments?.getInt("productId") ?: 0,
+                                productName = navBackStackEntry.arguments?.getString("productName").orEmpty(),
                             ) { mainNav.popBackStack() }
                         }
+                        composable(Routes.ProductMaterials.routes) { ProductMaterialsCrossRefScreen(innerPadding) }
                     }
                 }
             }
