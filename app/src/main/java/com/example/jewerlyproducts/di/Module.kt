@@ -3,8 +3,10 @@ package com.example.jewerlyproducts.di
 import android.app.Application
 import androidx.room.Room
 import com.example.jewerlyproducts.data.AppDatabase
+import com.example.jewerlyproducts.data.expenses.ExpensesDao
 import com.example.jewerlyproducts.data.materials.MaterialsDao
 import com.example.jewerlyproducts.data.products.ProductsDao
+import com.example.jewerlyproducts.data.sells.SellDao
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -37,6 +39,18 @@ object Module {
     @Singleton
     fun provideProductsDao(appDatabase: AppDatabase):ProductsDao {
         return appDatabase.productsDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideSellDao(appDatabase: AppDatabase):SellDao {
+        return appDatabase.sellDao
+    }
+
+    @Provides
+    @Singleton
+    fun provideExpenseDao(appDatabase: AppDatabase):ExpensesDao {
+        return appDatabase.expensesDao
     }
 
 }

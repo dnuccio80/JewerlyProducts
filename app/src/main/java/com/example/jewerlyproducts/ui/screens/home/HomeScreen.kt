@@ -26,6 +26,7 @@ import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,28 +42,55 @@ import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.jewerlyproducts.ui.components.AcceptDeclineButtons
 import com.example.jewerlyproducts.ui.components.BodyText
-import com.example.jewerlyproducts.ui.components.DialogWithListAndQuantity
+import com.example.jewerlyproducts.ui.components.ConfirmDialog
 import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.NumericTextField
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
+import com.example.jewerlyproducts.ui.components.SimpleButtonText
 import com.example.jewerlyproducts.ui.components.SingleLineTextFieldItem
+import com.example.jewerlyproducts.ui.components.TextFieldWithDropdownMenu
+import com.example.jewerlyproducts.ui.dataclasses.ExpenseDataClass
+import com.example.jewerlyproducts.ui.dataclasses.ProductSaver
+import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
+import com.example.jewerlyproducts.ui.dataclasses.SellDataClass
+import com.example.jewerlyproducts.ui.theme.Pink40
 import com.example.jewerlyproducts.ui.theme.Purple40
+import java.text.NumberFormat
+import java.util.Locale
 
 @Composable
 fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewModel()) {
 
     val showSellDialog by viewModel.showAddSellDialog.collectAsState()
     val showExpensesDialog by viewModel.showAddExpensesDialog.collectAsState()
+    var showClearBalanceDialog by rememberSaveable { mutableStateOf(false) }
+
     val quantitySell by viewModel.quantitySell.collectAsState()
     val expensesDescription by viewModel.expensesDescription.collectAsState()
     val expensesPrice by viewModel.expensesPrice.collectAsState()
 
+    val productList by viewModel.productList.collectAsState()
+    val sellList by viewModel.sellList.collectAsState()
+    val expensesList by viewModel.expensesList.collectAsState()
+    val totalSells by viewModel.totalSells.collectAsState()
+    val totalExpenses by viewModel.totalExpenses.collectAsState()
+
+    LaunchedEffect(sellList) {
+        viewModel.updateTotalSells()
+    }
+
+    LaunchedEffect(expensesList) {
+        viewModel.updateTotalExpenses()
+    }
+
     ScreenBackgroundComponent(innerPadding) {
         FirstTitleItem("Inicio")
-        BalanceCardItem()
-        SellsCardItem()
-        ExpensesCardItem()
+        BalanceCardItem(totalSells, totalExpenses) {
+            showClearBalanceDialog = true
+        }
+        SellsCardItem(sellList)
+        ExpensesCardItem(expensesList)
     }
     Box(Modifier.fillMaxSize()) {
         HomeFabItem(
@@ -72,20 +100,23 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
             onNewExpense = { viewModel.updateShowAddExpensesDialog(true) }
         )
     }
-    // Sell Dialog
-    DialogWithListAndQuantity(
-        showSellDialog,
-        "Agregar Venta",
-        itemList = emptyList(),
-        quantitySell,
-        onQuantitySellChange = { viewModel.updateQuantitySell(it) },
+    DialogWithListAndQuantitySell(
+        show = showSellDialog,
+        title = "Agregar Venta",
+        itemList = productList,
+        quantitySell = quantitySell,
+        onQuantitySellChange = {
+            viewModel.updateQuantitySell(it)
+        },
         onDismiss = {
             viewModel.updateShowSellDialog(false)
             viewModel.clearSellStats()
         },
-        onAccept = { material, quantity ->
-            viewModel.updateShowSellDialog(
-                false
+        onAccept = { product, quantity ->
+            viewModel.updateShowSellDialog(false)
+            viewModel.addSell(
+                product = product,
+                quantity = quantity
             )
         }
     )
@@ -96,13 +127,27 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
         price = expensesPrice,
         onDescriptionChange = { viewModel.updateExpensesDescription(it) },
         onPriceChange = { viewModel.updateExpensesPrice(it) },
-        onAddExpenses = { }
+        onAddExpenses = {
+            viewModel.addExpense(expensesDescription, expensesPrice.toInt())
+            viewModel.updateShowAddExpensesDialog(
+                false
+            )
+            viewModel.clearExpensesStats()
+        }
     ) {
         viewModel.updateShowAddExpensesDialog(
             false
         )
         viewModel.clearExpensesStats()
     }
+    ConfirmDialog(
+        show = showClearBalanceDialog,
+        text = "¿Segura que deseas eliminar toda la información de ventas y gastos?",
+        onAccept = {
+            viewModel.clearBalance()
+            showClearBalanceDialog = false
+        }
+    ) { showClearBalanceDialog = false }
 
 }
 
@@ -222,7 +267,7 @@ fun DropdownMenuHomeItem(
 }
 
 @Composable
-private fun ExpensesCardItem() {
+private fun ExpensesCardItem(expensesList: List<ExpenseDataClass>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -253,21 +298,20 @@ private fun ExpensesCardItem() {
                     rememberScrollState()
                 ), verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
-            TwoRowItem("Gastos varios", 50000)
+            if (expensesList.isNotEmpty()) {
+                expensesList.forEach { expense ->
+                    TwoRowItem(expense.description, formatToPrice(expense.value))
+
+                }
+            } else {
+                BodyText("No hay gastos agendados")
+            }
         }
     }
 }
 
 @Composable
-private fun SellsCardItem() {
+private fun SellsCardItem(sellList: List<SellDataClass>) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -298,17 +342,29 @@ private fun SellsCardItem() {
                     rememberScrollState()
                 ), verticalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            ThreeRowItem("Pulsera Roma", 100, 12500)
-            ThreeRowItem("Pulsera Roma", 100, 12500)
-            ThreeRowItem("Pulsera Roma", 100, 12500)
-            ThreeRowItem("Pulsera Roma", 100, 12500)
-            ThreeRowItem("Pulsera Roma", 100, 12500)
+            if (sellList.isEmpty()) {
+                BodyText("No hay ventas registradas")
+            } else {
+                sellList.forEach { sell ->
+                    ThreeRowItem(
+                        sell.product.productName, sell.quantity, formatToPrice(
+                            getSellValue(
+                                sellValue = sell.product.sellValue,
+                                quantity = sell.quantity
+                            )
+                        )
+                    )
+                }
+            }
         }
     }
 }
 
 @Composable
-fun BalanceCardItem() {
+fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> Unit) {
+
+    val balance = getBalance(totalSells, totalExpenses)
+
     Column(
         Modifier
             .fillMaxWidth()
@@ -332,7 +388,19 @@ fun BalanceCardItem() {
                 verticalArrangement = Arrangement.spacedBy(4.dp)
             ) {
                 Column(Modifier.fillMaxWidth()) {
-                    FirstTitleItem("Balance")
+                    Row(
+                        Modifier.fillMaxWidth(),
+                        verticalAlignment = Alignment.CenterVertically,
+                        horizontalArrangement = Arrangement.SpaceBetween
+                    ) {
+                        FirstTitleItem("Balance")
+                        SimpleButtonText(
+                            text = "Limpiar",
+                            color = Pink40
+                        ) {
+                            onClearBalance()
+                        }
+                    }
                     HorizontalDivider(
                         Modifier.fillMaxWidth(),
                         thickness = 2.dp,
@@ -340,9 +408,9 @@ fun BalanceCardItem() {
                     )
                     Spacer(Modifier.size(4.dp))
                 }
-                FirstTitleItem("$ 220.000", Color.Green)
-                BodyText("Ventas hechas: $102.000")
-                BodyText("Gastos: $52.000")
+                FirstTitleItem(formatToPrice(balance), getBalanceColor(balance))
+                BodyText("Ventas hechas: ${formatToPrice(totalSells)}")
+                BodyText("Gastos: ${formatToPrice(totalExpenses)}")
             }
         }
     }
@@ -350,7 +418,7 @@ fun BalanceCardItem() {
 
 
 @Composable
-private fun ThreeRowItem(title: String, quantity: Int, price: Int) {
+private fun ThreeRowItem(title: String, quantity: Int, price: String) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -363,12 +431,12 @@ private fun ThreeRowItem(title: String, quantity: Int, price: Int) {
             overflow = TextOverflow.Ellipsis
         )
         BodyText("x$quantity", modifier = Modifier.weight(.3f))
-        BodyText("$$price", modifier = Modifier.weight(.4f))
+        BodyText(price, modifier = Modifier.weight(.4f))
     }
 }
 
 @Composable
-private fun TwoRowItem(description: String, value: Int) {
+private fun TwoRowItem(description: String, value: String) {
     Row(
         Modifier.fillMaxWidth(),
         verticalAlignment = Alignment.CenterVertically,
@@ -380,7 +448,94 @@ private fun TwoRowItem(description: String, value: Int) {
             maxLines = 1,
             overflow = TextOverflow.Ellipsis
         )
-        BodyText("$$value")
+        BodyText(value)
     }
 }
 
+private fun getSellValue(sellValue: Int, quantity: Int): Int = sellValue * quantity
+
+@Composable
+private fun DialogWithListAndQuantitySell(
+    show: Boolean,
+    title: String,
+    itemList: List<ProductsDataClass>,
+    quantitySell: String,
+    onQuantitySellChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onAccept: (ProductsDataClass, Int) -> Unit
+) {
+    if (!show) return
+
+    var articleName by rememberSaveable { mutableStateOf("") }
+    val productSelected = rememberSaveable(saver = ProductSaver) {
+        mutableStateOf(
+            ProductsDataClass(
+                productName = "",
+                sellValue = 0,
+                imageUri = ""
+            )
+        )
+    }
+
+    Dialog(
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Purple40
+            ),
+            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    SecondTitleItem(title)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                }
+                TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { item ->
+                    when (item) {
+                        is ProductsDataClass -> {
+                            articleName = item.productName
+                            productSelected.value = item
+                        }
+                    }
+                }
+                NumericTextField(
+                    value = quantitySell,
+                    label = "Cantidad"
+                ) { onQuantitySellChange(it) }
+                AcceptDeclineButtons(
+                    acceptText = "Agregar",
+                    declineText = "Cancelar",
+                    onAccept = {
+                        onAccept(productSelected.value, quantitySell.toInt())
+                        onDismiss()
+                    },
+                    onDecline = { onDismiss() },
+                    enabled = (articleName.isNotBlank() && quantitySell.isNotBlank())
+                )
+            }
+        }
+    }
+}
+
+private fun getBalance(sells: Int, expenses: Int): Int = sells - expenses
+
+fun formatToPrice(number: Int): String {
+    val localeAR = Locale("es", "AR")
+    val formatter = NumberFormat.getInstance(localeAR)
+    return "$${formatter.format(number)}"
+}
+
+fun getBalanceColor(balance: Int): Color {
+    return if (balance > 0) {
+        Color.Green
+    } else if (balance < 0) {
+        Color.Red
+    } else Color.DarkGray
+}

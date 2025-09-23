@@ -1,12 +1,14 @@
 package com.example.jewerlyproducts.data.products
 
+import com.example.jewerlyproducts.data.materials.MaterialsDao
 import com.example.jewerlyproducts.data.relations.ProductMaterialsCrossRef
+import com.example.jewerlyproducts.ui.dataclasses.MaterialInProductWithQuantityDataClass
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
-class ProductRepository @Inject constructor(private val productDao: ProductsDao) {
+class ProductRepository @Inject constructor(private val productDao: ProductsDao, private val materialDao :MaterialsDao) {
 
     suspend fun addNewProduct(product: ProductsDataClass) {
         productDao.addProduct(product.toEntity())
@@ -40,6 +42,16 @@ class ProductRepository @Inject constructor(private val productDao: ProductsDao)
 
     suspend fun deleteProductMaterialCrossRef(productName:String) {
         productDao.deleteProductMaterialCrossRef(productName)
+    }
+
+    suspend fun getMaterialsWithQuantity(productName: String):List<MaterialInProductWithQuantityDataClass> {
+        val materialList = productDao.getProductMaterialCrossRef(productName)
+        return materialList.map { item ->
+            MaterialInProductWithQuantityDataClass(
+                material = materialDao.getMaterialByName(item.materialName).toDataClass(),
+                quantity = item.quantity
+            )
+        }
     }
 
 //    suspend fun getProductWithMaterials(productId: Int):ProductWithMaterials {

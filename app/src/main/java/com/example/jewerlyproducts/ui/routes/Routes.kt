@@ -12,5 +12,4 @@ sealed class Routes(val routes:String) {
         fun createRoute(productName:String) = "ProductDetails/$productName"
     }
     data object AddNewMaterial:Routes("AddNewMaterial")
-    data object ProductMaterials:Routes("productMaterials")
 }

@@ -46,6 +46,7 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
 import com.example.jewerlyproducts.R
 import com.example.jewerlyproducts.ui.components.AcceptDeclineButtons
+import com.example.jewerlyproducts.ui.components.BodyText
 import com.example.jewerlyproducts.ui.components.ConfirmDialog
 import com.example.jewerlyproducts.ui.components.DialogWithListAndQuantity
 import com.example.jewerlyproducts.ui.components.FirstTitleItem
@@ -54,7 +55,12 @@ import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.components.SimpleButtonText
 import com.example.jewerlyproducts.ui.components.SingleLineTextFieldItem
+import com.example.jewerlyproducts.ui.dataclasses.MaterialInProductWithQuantityDataClass
+import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
+import com.example.jewerlyproducts.ui.dataclasses.MaterialsSaver
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
+import com.example.jewerlyproducts.ui.screens.newproduct.EditMaterialInProductDialog
+import com.example.jewerlyproducts.ui.screens.newproduct.MaterialsInProductRowItem
 
 @Composable
 fun ProductDetailsScreen(
@@ -78,8 +84,17 @@ fun ProductDetailsScreen(
     val materialsList by viewModel.materialsList.collectAsState()
     val materialQuantity by viewModel.materialQuantity.collectAsState()
     val productImageUri by viewModel.productImageUri.collectAsState()
+    val materialsInProduct by viewModel.materialsInProduct.collectAsState()
 
     var showConfirmDialog by rememberSaveable { mutableStateOf(false) }
+
+    var showEditMaterialDialog by rememberSaveable { mutableStateOf(false) }
+    var materialToEdit by rememberSaveable(saver = MaterialsSaver) {
+        mutableStateOf(
+            MaterialsDataClass("", 0, 0, "")
+        )
+    }
+    var materialQuantityToEdit by rememberSaveable { mutableStateOf("") }
 
 
     val launcher = rememberLauncherForActivityResult(
@@ -163,15 +178,16 @@ fun ProductDetailsScreen(
                             color = Color.Cyan
                         )
                     }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Corralines", modifier = Modifier.weight(.8f))
-                        Text("100 u.", modifier = Modifier.weight(.5f))
-                        Text("$120", modifier = Modifier.weight(.2f))
-                    }
-                    Row(Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.SpaceBetween) {
-                        Text("Cristales de metal", modifier = Modifier.weight(.8f))
-                        Text("20 gr", modifier = Modifier.weight(.5f))
-                        Text("$1300", modifier = Modifier.weight(.2f))
+                    if (materialsInProduct.isEmpty()) {
+                        BodyText("Agrega los materiales que lleva el producto")
+                    } else {
+                        materialsInProduct.forEach {
+                            MaterialsInProductRowItem(it) { materialsInProduct ->
+                                materialToEdit = materialsInProduct.material
+                                materialQuantityToEdit = materialsInProduct.quantity.toString()
+                                showEditMaterialDialog = true
+                            }
+                        }
                     }
                 }
                 Spacer(Modifier.size(0.dp))
@@ -213,7 +229,7 @@ fun ProductDetailsScreen(
                     acceptText = "Modificar producto",
                     declineText = "Cancelar",
                     onAccept = {
-                        if(viewModel.isSellValueGreaterThanCostValue()) {
+                        if (viewModel.isSellValueGreaterThanCostValue()) {
                             viewModel.updateProduct(
                                 ProductsDataClass(
                                     productName = productName,
@@ -223,12 +239,16 @@ fun ProductDetailsScreen(
                             )
                             onDismiss()
                         } else {
-                            Toast.makeText(context, "El valor de venta tiene que ser superior a el costo del producto!", Toast.LENGTH_SHORT).show()
+                            Toast.makeText(
+                                context,
+                                "El valor de venta tiene que ser superior a el costo del producto!",
+                                Toast.LENGTH_SHORT
+                            ).show()
                         }
 
                     },
                     onDecline = { onDismiss() },
-                    enabled = productName.isNotBlank() && sellValue.isNotBlank()
+                    enabled = productName.isNotBlank() && sellValue.isNotBlank() && materialsInProduct.isNotEmpty()
                 )
                 Spacer(modifier = Modifier.size(16.dp))
                 DialogWithListAndQuantity(
@@ -241,8 +261,34 @@ fun ProductDetailsScreen(
                         viewModel.updateShowMaterialDialog(false)
                         viewModel.clearMaterialStats()
                     },
-                    onAccept = { material, quantity -> }
+                    onAccept = { material, quantity ->
+                        viewModel.addMaterialInProduct(
+                            material = MaterialInProductWithQuantityDataClass(
+                                material = material,
+                                quantity = quantity
+                            )
+                        )
+                    }
                 )
+                EditMaterialInProductDialog(
+                    show = showEditMaterialDialog,
+                    materialName = materialToEdit.materialName,
+                    quantity = if (materialQuantityToEdit.isNotBlank()) materialQuantityToEdit.toInt() else 0,
+                    onDismiss = { showEditMaterialDialog = false },
+                    onQuantityValueChange = { materialQuantityToEdit = it },
+                    onAccept = {
+                        viewModel.updateMaterialInProduct(
+                            MaterialInProductWithQuantityDataClass(
+                                material = materialToEdit,
+                                quantity = materialQuantityToEdit.toInt(),
+                            )
+                        )
+                    },
+                    onDelete = {
+                        viewModel.deleteMaterialInProduct(materialToEdit.materialName)
+                    }
+                )
+
                 ConfirmDialog(
                     show = showConfirmDialog,
                     text = "Segura que queres eliminar el producto?",

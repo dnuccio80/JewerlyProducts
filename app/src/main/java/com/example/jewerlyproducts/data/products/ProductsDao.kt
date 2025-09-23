@@ -36,11 +36,6 @@ interface ProductsDao {
 
     @Transaction
     @Query("SELECT * FROM ProductMaterialsCrossRef WHERE productName = :productName")
-    suspend fun getMaterialsWithQuantity(productName: String):Flow<List<MaterialWithQuantity>>
-
-//    @Transaction
-//    @Query("SELECT * FROM ProductsEntity WHERE productName = :productName")
-//    suspend fun getProductWithMaterials(productName: String):ProductWithMaterials
-
+    suspend fun getProductMaterialCrossRef(productName: String):List<ProductMaterialsCrossRef>
 
 }

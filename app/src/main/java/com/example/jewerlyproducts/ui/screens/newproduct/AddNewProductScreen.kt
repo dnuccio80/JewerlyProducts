@@ -187,7 +187,7 @@ fun AddNewProductScreen(
                         containerColor = if (productImageUri.isNotBlank()) Color.Green else Color.DarkGray
                     )
                 ) {
-                    Text("Seleccionar foto")
+                    Text("Seleccionar foto", color = Color.White)
                 }
                 if (productImageUri.isNotBlank()) {
                     Box(Modifier.size(150.dp), contentAlignment = Alignment.TopEnd) {
@@ -232,7 +232,7 @@ fun AddNewProductScreen(
                         }
                     },
                     onDecline = { onDismiss() },
-                    enabled = productName.isNotBlank() && sellValue != null
+                    enabled = productName.isNotBlank() && sellValue != null && costValue != 0
                 )
                 Spacer(modifier = Modifier.size(16.dp))
 
@@ -280,7 +280,7 @@ fun AddNewProductScreen(
 }
 
 @Composable
-private fun EditMaterialInProductDialog(
+fun EditMaterialInProductDialog(
     show: Boolean,
     materialName: String,
     quantity: Int,
@@ -355,7 +355,7 @@ private fun EditMaterialInProductDialog(
 }
 
 @Composable
-private fun MaterialsInProductRowItem(
+fun MaterialsInProductRowItem(
     material: MaterialInProductWithQuantityDataClass,
     onClick: (MaterialInProductWithQuantityDataClass) -> Unit
 ) {

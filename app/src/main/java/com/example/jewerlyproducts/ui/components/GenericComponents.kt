@@ -303,7 +303,13 @@ fun TextFieldWithDropdownMenu(
                     }
 
                     is ProductsDataClass -> {
-
+                        DropdownMenuItem(
+                            text = { BodyText(it.productName) },
+                            onClick = {
+                                onValueChange(it)
+                                showMenu = false
+                            }
+                        )
                     }
                 }
             }
@@ -323,7 +329,6 @@ fun DialogWithListAndQuantity(
     onAccept: (MaterialsDataClass, Int) -> Unit
 ) {
     if (!show) return
-
 
     var articleName by rememberSaveable { mutableStateOf("") }
     val materialSelected = rememberSaveable(saver = MaterialsSaver) {

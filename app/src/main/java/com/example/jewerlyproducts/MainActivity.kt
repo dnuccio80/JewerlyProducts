@@ -23,7 +23,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.navigation.NavArgument
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -33,12 +32,11 @@ import androidx.navigation.navArgument
 import com.example.jewerlyproducts.ui.routes.Routes
 import com.example.jewerlyproducts.ui.screens.home.HomeScreen
 import com.example.jewerlyproducts.ui.screens.materialdetails.MaterialDetailsScreen
-import com.example.jewerlyproducts.ui.screens.newmaterial.AddNewMaterialScreen
 import com.example.jewerlyproducts.ui.screens.materialslist.MaterialsListScreen
+import com.example.jewerlyproducts.ui.screens.newmaterial.AddNewMaterialScreen
 import com.example.jewerlyproducts.ui.screens.newproduct.AddNewProductScreen
 import com.example.jewerlyproducts.ui.screens.productdetails.ProductDetailsScreen
 import com.example.jewerlyproducts.ui.screens.productslist.ProductsListScreen
-import com.example.jewerlyproducts.ui.screens.testing.ProductMaterialsCrossRefScreen
 import com.example.jewerlyproducts.ui.theme.JewerlyProductsTheme
 import dagger.hilt.android.AndroidEntryPoint
 
@@ -72,7 +70,7 @@ class MainActivity : ComponentActivity() {
                         BottomBar(currentTarget) { action ->
                             when (action) {
                                 BottomBarNavAction.HOME -> {
-                                    mainNav.navigate(Routes.ProductMaterials.routes) {
+                                    mainNav.navigate(Routes.Home.routes) {
                                         popUpTo(mainNav.graph.startDestinationId) {
                                             saveState = true
                                         }
@@ -107,7 +105,7 @@ class MainActivity : ComponentActivity() {
                 ) { innerPadding ->
                     NavHost(
                         navController = mainNav,
-                        startDestination = Routes.ProductMaterials.routes
+                        startDestination = Routes.Home.routes
                     ) {
                         composable(Routes.Home.routes) { HomeScreen(innerPadding) }
                         composable(Routes.ProductList.routes) {
@@ -171,7 +169,6 @@ class MainActivity : ComponentActivity() {
                                 productName = navBackStackEntry.arguments?.getString("productName").orEmpty(),
                             ) { mainNav.popBackStack() }
                         }
-                        composable(Routes.ProductMaterials.routes) { ProductMaterialsCrossRefScreen(innerPadding) }
                     }
                 }
             }
