@@ -19,7 +19,7 @@ class SellRepository @Inject constructor(private val dao: SellDao) {
 
     suspend fun deleteSell(sellId:Int) = dao.deleteSell(sellId)
 
-    suspend fun updateSell(sell: SellEntity) = dao.updateSell(sell)
+    suspend fun updateSell(sell: SellDataClass) = dao.updateSell(sell.toEntity())
 
     suspend fun deleteAllSells() = dao.deleteAllSells()
 }

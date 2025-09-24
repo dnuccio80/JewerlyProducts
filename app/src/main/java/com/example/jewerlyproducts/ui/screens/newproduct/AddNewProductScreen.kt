@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.newproduct
 
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -98,7 +99,11 @@ fun AddNewProductScreen(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
             uri?.let {
-                viewModel.updateImageUri(uri.toString())
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                viewModel.updateImageUri(it.toString())
             }
         }
     )
@@ -314,42 +319,42 @@ fun EditMaterialInProductDialog(
                     SecondTitleItem("Editar material")
                     HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
-            }
-            SingleLineTextFieldItem(
-                value = materialName,
-                label = "",
-                enabled = false
-            ) { }
-            NumericTextField(
-                value = quantity.toString(),
-                label = "Cantidad"
-            ) { onQuantityValueChange(it) }
-            AcceptDeclineButtons(
-                acceptText = "Agregar",
-                declineText = "Cancelar",
-                onAccept = {
-                    onAccept()
-                    onDismiss()
-                },
-                onDecline = { onDismiss() },
-                enabled = (quantity != 0 && quantity.toString().isNotBlank())
-            )
-            Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                SimpleButtonText("Eliminar Material", Color.Red) {
-                    showConfirmDialog = true
-                }
-            }
-            ConfirmDialog(
-                show = showConfirmDialog,
-                text = "¿Estás segura que queres eliminar el material?",
-                onAccept = {
-                    onDelete()
-                    showConfirmDialog = false
-                    onDismiss()
-                },
-                onDismiss = { showConfirmDialog = false }
-            )
 
+                SingleLineTextFieldItem(
+                    value = materialName,
+                    label = "",
+                    enabled = false
+                ) { }
+                NumericTextField(
+                    value = quantity.toString(),
+                    label = "Cantidad"
+                ) { onQuantityValueChange(it) }
+                AcceptDeclineButtons(
+                    acceptText = "Agregar",
+                    declineText = "Cancelar",
+                    onAccept = {
+                        onAccept()
+                        onDismiss()
+                    },
+                    onDecline = { onDismiss() },
+                    enabled = (quantity != 0 && quantity.toString().isNotBlank())
+                )
+                Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
+                    SimpleButtonText("Eliminar Material", Color.Red) {
+                        showConfirmDialog = true
+                    }
+                }
+                ConfirmDialog(
+                    show = showConfirmDialog,
+                    text = "¿Estás segura que queres eliminar el material?",
+                    onAccept = {
+                        onDelete()
+                        showConfirmDialog = false
+                        onDismiss()
+                    },
+                    onDismiss = { showConfirmDialog = false }
+                )
+            }
         }
     }
 }
@@ -378,6 +383,7 @@ fun MaterialsInProductRowItem(
 }
 
 fun getMaterialCost(quantity: Int, unitPrice: Int): Int = quantity * unitPrice
-fun getUnitPrice(pricePerPack: Int, quantityPerPack: Int): Int = ceil(pricePerPack.toDouble() / quantityPerPack).toInt()
+fun getUnitPrice(pricePerPack: Int, quantityPerPack: Int): Int =
+    ceil(pricePerPack.toDouble() / quantityPerPack).toInt()
 
 

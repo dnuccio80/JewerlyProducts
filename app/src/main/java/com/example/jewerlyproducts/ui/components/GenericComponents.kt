@@ -109,6 +109,8 @@ fun FloatingButton(innerPadding: PaddingValues, onClick: () -> Unit) {
 fun AcceptDeclineButtons(
     acceptText: String,
     declineText: String,
+    acceptColor:Color = Color.Green.copy(alpha = .5f),
+    declineColor:Color = Color.DarkGray.copy(alpha = .5f),
     onAccept: () -> Unit,
     onDecline: () -> Unit,
     enabled: Boolean = true
@@ -121,7 +123,7 @@ fun AcceptDeclineButtons(
         Button(
             onClick = { onDecline() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.DarkGray.copy(alpha = .5f)
+                containerColor = declineColor
             ),
             shape = RoundedCornerShape(8.dp)
         ) {
@@ -130,7 +132,7 @@ fun AcceptDeclineButtons(
         Button(
             onClick = { onAccept() },
             colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Green.copy(alpha = .5f)
+                containerColor = acceptColor
             ),
             enabled = enabled,
             shape = RoundedCornerShape(8.dp)
@@ -177,6 +179,20 @@ fun SimpleButtonText(text: String, color: Color, onClick: () -> Unit) {
         colors = ButtonDefaults.buttonColors(
             containerColor = color
         ),
+        shape = RoundedCornerShape(8.dp)
+    ) {
+        BodyText(text)
+    }
+}
+
+@Composable
+fun SmallButtonText(text: String, color: Color, onClick: () -> Unit ) {
+    Button(
+        onClick = { onClick() },
+        colors = ButtonDefaults.buttonColors(
+            containerColor = color
+        ),
+        contentPadding = PaddingValues(horizontal = 8.dp, vertical = 0.dp),
         shape = RoundedCornerShape(8.dp)
     ) {
         BodyText(text)

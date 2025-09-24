@@ -17,7 +17,7 @@ class ExpensesRepository @Inject constructor(private val dao:ExpensesDao) {
 
     suspend fun deleteExpenseFromId(expenseId:Int) = dao.deleteExpenseFromId(expenseId)
 
-    suspend fun updateExpense(expense: ExpensesEntity) = dao.updateExpense(expense)
+    suspend fun updateExpense(expense: ExpenseDataClass) = dao.updateExpense(expense.toEntity())
 
     suspend fun deleteAllExpenses() = dao.deleteAllExpenses()
 

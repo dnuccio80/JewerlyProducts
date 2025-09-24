@@ -17,6 +17,7 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import javax.inject.Inject
+import kotlin.math.exp
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -121,6 +122,22 @@ class HomeViewModel @Inject constructor(
         }
     }
 
+    fun clearAllSells() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sellRepository.deleteAllSells()
+            }
+        }
+    }
+
+    fun clearAllExpenses() {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                expenseRepository.deleteAllExpenses()
+            }
+        }
+    }
+
     fun updateTotalSells() {
         _totalSells.value = 0
 
@@ -134,6 +151,38 @@ class HomeViewModel @Inject constructor(
 
         _expensesList.value.forEach { expense ->
             _totalExpenses.value += expense.value
+        }
+    }
+
+    fun updateSell(sell: SellDataClass) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sellRepository.updateSell(sell)
+            }
+        }
+    }
+
+    fun deleteSell(sellId:Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                sellRepository.deleteSell(sellId)
+            }
+        }
+    }
+
+    fun updateExpense(expense:ExpenseDataClass) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                expenseRepository.updateExpense(expense)
+            }
+        }
+    }
+
+    fun deleteExpense(expenseId:Int) {
+        viewModelScope.launch {
+            withContext(Dispatchers.IO) {
+                expenseRepository.deleteExpenseFromId(expenseId)
+            }
         }
     }
 

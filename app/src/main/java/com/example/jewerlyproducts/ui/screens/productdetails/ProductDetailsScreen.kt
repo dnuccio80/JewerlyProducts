@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.productdetails
 
+import android.content.Intent
 import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -100,7 +101,13 @@ fun ProductDetailsScreen(
     val launcher = rememberLauncherForActivityResult(
         contract = ActivityResultContracts.GetContent(),
         onResult = { uri: Uri? ->
-            viewModel.updateImageUri(uri.toString())
+            uri?.let {
+                context.contentResolver.takePersistableUriPermission(
+                    it,
+                    Intent.FLAG_GRANT_READ_URI_PERMISSION
+                )
+                viewModel.updateImageUri(it.toString())
+            }
         }
     )
 

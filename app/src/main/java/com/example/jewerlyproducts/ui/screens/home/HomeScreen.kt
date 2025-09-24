@@ -1,6 +1,7 @@
 package com.example.jewerlyproducts.ui.screens.home
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -17,6 +18,8 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.ArrowDropDown
+import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -25,10 +28,13 @@ import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
 import androidx.compose.material3.Text
+import androidx.compose.material3.TextField
+import androidx.compose.material3.TextFieldDefaults
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableIntStateOf
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
@@ -40,6 +46,7 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
+import com.example.jewerlyproducts.data.expenses.ExpensesRepository
 import com.example.jewerlyproducts.ui.components.AcceptDeclineButtons
 import com.example.jewerlyproducts.ui.components.BodyText
 import com.example.jewerlyproducts.ui.components.ConfirmDialog
@@ -49,6 +56,7 @@ import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.components.SimpleButtonText
 import com.example.jewerlyproducts.ui.components.SingleLineTextFieldItem
+import com.example.jewerlyproducts.ui.components.SmallButtonText
 import com.example.jewerlyproducts.ui.components.TextFieldWithDropdownMenu
 import com.example.jewerlyproducts.ui.dataclasses.ExpenseDataClass
 import com.example.jewerlyproducts.ui.dataclasses.ProductSaver
@@ -64,7 +72,10 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
 
     val showSellDialog by viewModel.showAddSellDialog.collectAsState()
     val showExpensesDialog by viewModel.showAddExpensesDialog.collectAsState()
+
     var showClearBalanceDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearSellsDialog by rememberSaveable { mutableStateOf(false) }
+    var showClearExpensesDialog by rememberSaveable { mutableStateOf(false) }
 
     val quantitySell by viewModel.quantitySell.collectAsState()
     val expensesDescription by viewModel.expensesDescription.collectAsState()
@@ -89,8 +100,26 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
         BalanceCardItem(totalSells, totalExpenses) {
             showClearBalanceDialog = true
         }
-        SellsCardItem(sellList)
-        ExpensesCardItem(expensesList)
+        SellsCardItem(
+            sellList,
+            onClearSell = { showClearSellsDialog = true },
+            onEditSell = { sell ->
+                viewModel.updateSell(sell)
+            },
+            onDelete = { sellId -> viewModel.deleteSell(sellId) }
+        )
+        ExpensesCardItem(
+            expensesList,
+            onClearExpenses = { showClearExpensesDialog = true },
+            onEditExpense = { expense ->
+                viewModel.updateExpense(expense)
+                showClearExpensesDialog = false
+            },
+            onDelete = { expenseId ->
+                viewModel.deleteExpense(expenseId)
+
+            }
+        )
     }
     Box(Modifier.fillMaxSize()) {
         HomeFabItem(
@@ -148,6 +177,22 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
             showClearBalanceDialog = false
         }
     ) { showClearBalanceDialog = false }
+    ConfirmDialog(
+        show = showClearSellsDialog,
+        text = "¿Segura que deseas eliminar toda la información de ventas?",
+        onAccept = {
+            viewModel.clearAllSells()
+            showClearSellsDialog = false
+        }
+    ) { showClearSellsDialog = false }
+    ConfirmDialog(
+        show = showClearExpensesDialog,
+        text = "¿Segura que deseas eliminar toda la información de gastos?",
+        onAccept = {
+            viewModel.clearAllExpenses()
+            showClearExpensesDialog = false
+        }
+    ) { showClearExpensesDialog = false }
 
 }
 
@@ -199,6 +244,70 @@ fun ExpensesDialog(
                         onDismiss()
                     },
                     onDecline = { onDismiss() },
+                    enabled = (description.isNotBlank() && price.isNotBlank())
+                )
+            }
+        }
+    }
+}
+
+@Composable
+fun ExpensesDialogEdit(
+    show: Boolean,
+    expenseId: Int,
+    description: String,
+    price: String,
+    onModifyExpense: (ExpenseDataClass) -> Unit,
+    onModifyDescription: (String) -> Unit,
+    onModifyPrice: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onDelete: () -> Unit
+) {
+
+    if (!show) return
+
+    Dialog(
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Purple40
+            ),
+            shape = RoundedCornerShape(4.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    SecondTitleItem("Modificar Gasto")
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                }
+                SingleLineTextFieldItem(
+                    value = description,
+                    label = "Descripción"
+                ) {
+                    onModifyDescription(it)
+                }
+                NumericTextField(
+                    value = price,
+                    label = "Costo"
+                ) { onModifyPrice(it) }
+                AcceptDeclineButtons(
+                    acceptText = "Modificar",
+                    declineText = "Borrar",
+                    declineColor = Color.Red.copy(alpha = .6f),
+                    onAccept = {
+                        onModifyExpense(
+                            ExpenseDataClass(
+                                expenseId = expenseId,
+                                description = description,
+                                value = price.toInt()
+                            )
+                        )
+                        onDismiss()
+                    },
+                    onDecline = { onDelete() },
                     enabled = (description.isNotBlank() && price.isNotBlank())
                 )
             }
@@ -267,7 +376,19 @@ fun DropdownMenuHomeItem(
 }
 
 @Composable
-private fun ExpensesCardItem(expensesList: List<ExpenseDataClass>) {
+private fun ExpensesCardItem(
+    expensesList: List<ExpenseDataClass>,
+    onClearExpenses: () -> Unit,
+    onEditExpense: (ExpenseDataClass) -> Unit,
+    onDelete: (Int) -> Unit
+) {
+
+    var showEditExpenseDialog by rememberSaveable { mutableStateOf(false) }
+    var showConfirmDeleteExpenseDialog by rememberSaveable { mutableStateOf(false) }
+    var expenseId by rememberSaveable { mutableIntStateOf(0) }
+    var description by rememberSaveable { mutableStateOf("") }
+    var value by rememberSaveable { mutableStateOf("") }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -282,7 +403,19 @@ private fun ExpensesCardItem(expensesList: List<ExpenseDataClass>) {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxWidth()
         ) {
-            FirstTitleItem("Gastos")
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                FirstTitleItem("Gastos")
+
+                SmallButtonText(
+                    text = "Limpiar",
+                    color = Pink40,
+                    onClick = { onClearExpenses() }
+                )
+            }
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
@@ -300,18 +433,73 @@ private fun ExpensesCardItem(expensesList: List<ExpenseDataClass>) {
         ) {
             if (expensesList.isNotEmpty()) {
                 expensesList.forEach { expense ->
-                    TwoRowItem(expense.description, formatToPrice(expense.value))
+                    TwoRowItem(expense.description, formatToPrice(expense.value)) {
+                        expenseId = expense.expenseId
+                        description = expense.description
+                        value = expense.value.toString()
+                        showEditExpenseDialog = true
 
+                    }
                 }
             } else {
                 BodyText("No hay gastos agendados")
             }
         }
+        ExpensesDialogEdit(
+            show = showEditExpenseDialog,
+            expenseId = expenseId,
+            description = description,
+            price = value,
+            onModifyExpense = { expense ->
+                onEditExpense(expense)
+                showEditExpenseDialog = false
+            },
+            onDismiss = {
+                showEditExpenseDialog = false
+            },
+            onDelete = {
+                showConfirmDeleteExpenseDialog = true
+            },
+            onModifyDescription = { description = it },
+            onModifyPrice = { value = it }
+        )
+        ConfirmDialog(
+            show = showConfirmDeleteExpenseDialog,
+            text = "¿Segura que querés eliminar el gasto?",
+            onAccept = {
+                onDelete(expenseId)
+                showConfirmDeleteExpenseDialog = false
+                showEditExpenseDialog = false
+            },
+            onDismiss = {
+                showConfirmDeleteExpenseDialog = false
+            }
+        )
     }
 }
 
 @Composable
-private fun SellsCardItem(sellList: List<SellDataClass>) {
+private fun SellsCardItem(
+    sellList: List<SellDataClass>,
+    onClearSell: () -> Unit,
+    onEditSell: (SellDataClass) -> Unit,
+    onDelete: (Int) -> Unit
+) {
+
+    var showEditSell by rememberSaveable { mutableStateOf(false) }
+    var productSelected by rememberSaveable(saver = ProductSaver) {
+        mutableStateOf(
+            ProductsDataClass(
+                productName = "",
+                sellValue = 0,
+                imageUri = ""
+            )
+        )
+    }
+    var quantity by rememberSaveable { mutableStateOf("") }
+    var showConfirmDeleteDialog by rememberSaveable { mutableStateOf(false) }
+    var sellId by rememberSaveable { mutableIntStateOf(0) }
+
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -326,7 +514,18 @@ private fun SellsCardItem(sellList: List<SellDataClass>) {
                 .padding(horizontal = 16.dp, vertical = 8.dp)
                 .fillMaxWidth()
         ) {
-            FirstTitleItem("Ventas")
+            Row(
+                Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                FirstTitleItem("Ventas")
+                SmallButtonText(
+                    text = "Limpiar",
+                    color = Pink40,
+                    onClick = { onClearSell() }
+                )
+            }
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
@@ -353,10 +552,43 @@ private fun SellsCardItem(sellList: List<SellDataClass>) {
                                 quantity = sell.quantity
                             )
                         )
-                    )
+                    ) {
+                        productSelected = sell.product
+                        quantity = sell.quantity.toString()
+                        sellId = sell.sellId
+                        showEditSell = true
+                    }
                 }
             }
         }
+        DialogWithListAndQuantitySellEdit(
+            show = showEditSell,
+            item = productSelected,
+            quantitySell = quantity,
+            onQuantitySellChange = { quantity = it },
+            onDismiss = { showEditSell = false },
+            onAccept = { product, quantity ->
+                onEditSell(
+                    SellDataClass(
+                        sellId = sellId,
+                        product = product,
+                        quantity = quantity
+                    )
+                )
+                showEditSell = false
+            }
+        ) { showConfirmDeleteDialog = true }
+        ConfirmDialog(
+            show = showConfirmDeleteDialog,
+            text = "¿Segura que querés eliminar la venta?",
+            onAccept = {
+                onDelete(sellId)
+                showConfirmDeleteDialog = false
+            },
+            onDismiss = {
+                showConfirmDeleteDialog = false
+            }
+        )
     }
 }
 
@@ -394,12 +626,11 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         FirstTitleItem("Balance")
-                        SimpleButtonText(
+                        SmallButtonText(
                             text = "Limpiar",
-                            color = Pink40
-                        ) {
-                            onClearBalance()
-                        }
+                            color = Pink40,
+                            onClick = { onClearBalance() }
+                        )
                     }
                     HorizontalDivider(
                         Modifier.fillMaxWidth(),
@@ -418,9 +649,11 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
 
 
 @Composable
-private fun ThreeRowItem(title: String, quantity: Int, price: String) {
+private fun ThreeRowItem(title: String, quantity: Int, price: String, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -436,9 +669,11 @@ private fun ThreeRowItem(title: String, quantity: Int, price: String) {
 }
 
 @Composable
-private fun TwoRowItem(description: String, value: String) {
+private fun TwoRowItem(description: String, value: String, onClick: () -> Unit) {
     Row(
-        Modifier.fillMaxWidth(),
+        Modifier
+            .fillMaxWidth()
+            .clickable { onClick() },
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.SpaceBetween
     ) {
@@ -517,6 +752,80 @@ private fun DialogWithListAndQuantitySell(
                         onDismiss()
                     },
                     onDecline = { onDismiss() },
+                    enabled = (articleName.isNotBlank() && quantitySell.isNotBlank())
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DialogWithListAndQuantitySellEdit(
+    show: Boolean,
+    item: ProductsDataClass,
+    quantitySell: String,
+    onQuantitySellChange: (String) -> Unit,
+    onDismiss: () -> Unit,
+    onAccept: (ProductsDataClass, Int) -> Unit,
+    onDelete: () -> Unit
+) {
+    if (!show) return
+
+    val articleName by rememberSaveable { mutableStateOf(item.productName) }
+
+    Dialog(
+        onDismissRequest = { onDismiss() }
+    ) {
+        Card(
+            colors = CardDefaults.cardColors(
+                containerColor = Purple40
+            ),
+            shape = RoundedCornerShape(4.dp),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(16.dp)
+        ) {
+            Column(
+                modifier = Modifier.padding(16.dp),
+                verticalArrangement = Arrangement.spacedBy(16.dp)
+            ) {
+                Column {
+                    SecondTitleItem("Modificar Venta")
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                }
+                TextField(
+                    value = articleName,
+                    onValueChange = { },
+                    enabled = false,
+                    colors = TextFieldDefaults.colors(
+                        focusedContainerColor = Color.Transparent,
+                        unfocusedContainerColor = Color.Transparent,
+                        disabledContainerColor = Color.Transparent,
+                        disabledTextColor = Color.White
+                    ),
+                    trailingIcon = {
+                        Icon(
+                            Icons.Filled.ArrowDropDown,
+                            contentDescription = "",
+                            tint = Color.White
+                        )
+                    }
+                )
+                NumericTextField(
+                    value = quantitySell,
+                    label = "Cantidad"
+                ) { onQuantitySellChange(it) }
+                AcceptDeclineButtons(
+                    acceptText = "Modificar",
+                    declineText = "Borrar",
+                    declineColor = Color.Red.copy(alpha = .6f),
+                    onAccept = {
+                        onAccept(item, quantitySell.toInt())
+                        onDismiss()
+                    },
+                    onDecline = {
+                        onDelete()
+                    },
                     enabled = (articleName.isNotBlank() && quantitySell.isNotBlank())
                 )
             }
