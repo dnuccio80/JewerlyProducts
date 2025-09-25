@@ -12,8 +12,10 @@ val Pink40 = Color(0xFF7D5260)
 
 // App Colors
 val LightBrown = Color(0xFFE6C7A8)
+val LightBrownCard = Color(0xFFC5AC91)
 val MainLight = Color(0xFFF9F0E7)
 val SecondLight = Color(0xFFF3DBDB)
+val SecondLightCard = Color(0xFFC7A5A5)
 val MainColor = Color(0xFFC28984)
 val AccentColor = Color(0xFF753A38)
 val BackAccentColor = Color(0xFF441716)

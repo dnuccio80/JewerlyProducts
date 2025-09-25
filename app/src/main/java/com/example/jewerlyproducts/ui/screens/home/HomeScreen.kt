@@ -63,12 +63,14 @@ import com.example.jewerlyproducts.ui.dataclasses.SellDataClass
 import com.example.jewerlyproducts.ui.theme.AccentColor
 import com.example.jewerlyproducts.ui.theme.BackAccentColor
 import com.example.jewerlyproducts.ui.theme.LightBrown
+import com.example.jewerlyproducts.ui.theme.LightBrownCard
 import com.example.jewerlyproducts.ui.theme.MainColor
 import com.example.jewerlyproducts.ui.theme.MainGreen
 import com.example.jewerlyproducts.ui.theme.MainLight
 import com.example.jewerlyproducts.ui.theme.Purple40
 import com.example.jewerlyproducts.ui.theme.RudeRed
 import com.example.jewerlyproducts.ui.theme.SecondLight
+import com.example.jewerlyproducts.ui.theme.SecondLightCard
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -229,7 +231,7 @@ fun ExpensesDialog(
             ) {
                 Column {
                     SecondTitleItem("Agregar Gasto")
-                    HorizontalDivider(thickness = 2.dp, color = MainLight)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
                 SingleLineTextFieldItem(
                     value = description,
@@ -287,7 +289,7 @@ fun ExpensesDialogEdit(
             ) {
                 Column {
                     SecondTitleItem("Modificar Gasto")
-                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
                 SingleLineTextFieldItem(
                     value = description,
@@ -401,8 +403,10 @@ private fun ExpensesCardItem(
             .height(250.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MainColor
-        )
+            containerColor = SecondLightCard
+        ),
+        border = BorderStroke(0.3.dp, MainLight)
+
     ) {
         Column(
             Modifier
@@ -425,7 +429,7 @@ private fun ExpensesCardItem(
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
-                color = SecondLight
+                color = Color.White
             )
             Spacer(Modifier.size(4.dp))
         }
@@ -512,8 +516,11 @@ private fun SellsCardItem(
             .height(250.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = MainColor
-        )
+            containerColor = LightBrownCard
+        ),
+        border = BorderStroke(0.3.dp, MainLight)
+
+
     ) {
         Column(
             Modifier
@@ -525,7 +532,7 @@ private fun SellsCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FirstTitleItem("Ventas", color = MainLight)
+                FirstTitleItem("Ventas", color = Color.White)
                 SmallButtonText(
                     text = "Limpiar",
                     color = AccentColor,
@@ -535,7 +542,7 @@ private fun SellsCardItem(
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
-                color = SecondLight
+                color = Color.White
             )
             Spacer(Modifier.size(4.dp))
         }
@@ -617,7 +624,8 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
             colors = CardDefaults.cardColors(
                 containerColor = MainColor
             ),
-            
+            border = BorderStroke(0.3.dp, MainLight)
+
         ) {
 
 
@@ -643,7 +651,7 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
                     HorizontalDivider(
                         Modifier.fillMaxWidth(),
                         thickness = 2.dp,
-                        color = SecondLight
+                        color = Color.White
                     )
                     Spacer(Modifier.size(4.dp))
                 }
@@ -738,7 +746,7 @@ private fun DialogWithListAndQuantitySell(
             ) {
                 Column {
                     SecondTitleItem("Agregar venta")
-                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
                 TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { item ->
                     when (item) {
@@ -801,7 +809,7 @@ private fun DialogWithListAndQuantitySellEdit(
             ) {
                 Column {
                     SecondTitleItem("Modificar Venta")
-                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
+                    HorizontalDivider(thickness = 2.dp, color = Color.White)
                 }
                 TextField(
                     value = articleName,
