@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.components
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -26,6 +27,7 @@ import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.FloatingActionButton
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MenuItemColors
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.material3.TextFieldDefaults
@@ -47,8 +49,13 @@ import androidx.compose.ui.window.Dialog
 import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
 import com.example.jewerlyproducts.ui.dataclasses.MaterialsSaver
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
+import com.example.jewerlyproducts.ui.theme.AccentColor
+import com.example.jewerlyproducts.ui.theme.LightBrown
+import com.example.jewerlyproducts.ui.theme.MainGreen
+import com.example.jewerlyproducts.ui.theme.MainLight
 import com.example.jewerlyproducts.ui.theme.Purple40
 import com.example.jewerlyproducts.ui.theme.Purple80
+import com.example.jewerlyproducts.ui.theme.RudeRed
 
 @Composable
 fun FirstTitleItem(text: String, color: Color = Color.White) {
@@ -109,7 +116,7 @@ fun FloatingButton(innerPadding: PaddingValues, onClick: () -> Unit) {
 fun AcceptDeclineButtons(
     acceptText: String,
     declineText: String,
-    acceptColor:Color = Color.Green.copy(alpha = .5f),
+    acceptColor:Color = MainGreen,
     declineColor:Color = Color.DarkGray.copy(alpha = .5f),
     onAccept: () -> Unit,
     onDecline: () -> Unit,
@@ -152,8 +159,9 @@ fun ConfirmDialog(show: Boolean, text: String, onAccept: () -> Unit, onDismiss: 
     ) {
         Card(
             shape = RoundedCornerShape(4.dp), colors = CardDefaults.cardColors(
-                containerColor = Purple40
-            )
+                containerColor = AccentColor
+            ),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 verticalArrangement = Arrangement.spacedBy(16.dp),
@@ -164,6 +172,7 @@ fun ConfirmDialog(show: Boolean, text: String, onAccept: () -> Unit, onDismiss: 
                 AcceptDeclineButtons(
                     acceptText = "Confirmar",
                     declineText = "Cancelar",
+                    acceptColor = RudeRed,
                     onAccept = { onAccept() },
                     onDecline = { onDismiss() },
                 )
@@ -303,7 +312,7 @@ fun TextFieldWithDropdownMenu(
             showMenu,
             scrollState = rememberScrollState(),
             onDismissRequest = { showMenu = false },
-            containerColor = Purple80,
+            containerColor = LightBrown,
             modifier = Modifier.heightIn(min = 60.dp, max = 150.dp)
         ) {
             itemList.forEach {
@@ -314,7 +323,7 @@ fun TextFieldWithDropdownMenu(
                             onClick = {
                                 onValueChange(it)
                                 showMenu = false
-                            }
+                            },
                         )
                     }
 

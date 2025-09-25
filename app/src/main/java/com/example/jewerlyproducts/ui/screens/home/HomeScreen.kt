@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.home
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -19,7 +20,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
 import androidx.compose.material.icons.filled.ArrowDropDown
-import androidx.compose.material3.Button
 import androidx.compose.material3.Card
 import androidx.compose.material3.CardDefaults
 import androidx.compose.material3.DropdownMenu
@@ -46,7 +46,6 @@ import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.jewerlyproducts.data.expenses.ExpensesRepository
 import com.example.jewerlyproducts.ui.components.AcceptDeclineButtons
 import com.example.jewerlyproducts.ui.components.BodyText
 import com.example.jewerlyproducts.ui.components.ConfirmDialog
@@ -54,7 +53,6 @@ import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.NumericTextField
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
-import com.example.jewerlyproducts.ui.components.SimpleButtonText
 import com.example.jewerlyproducts.ui.components.SingleLineTextFieldItem
 import com.example.jewerlyproducts.ui.components.SmallButtonText
 import com.example.jewerlyproducts.ui.components.TextFieldWithDropdownMenu
@@ -62,8 +60,15 @@ import com.example.jewerlyproducts.ui.dataclasses.ExpenseDataClass
 import com.example.jewerlyproducts.ui.dataclasses.ProductSaver
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import com.example.jewerlyproducts.ui.dataclasses.SellDataClass
-import com.example.jewerlyproducts.ui.theme.Pink40
+import com.example.jewerlyproducts.ui.theme.AccentColor
+import com.example.jewerlyproducts.ui.theme.BackAccentColor
+import com.example.jewerlyproducts.ui.theme.LightBrown
+import com.example.jewerlyproducts.ui.theme.MainColor
+import com.example.jewerlyproducts.ui.theme.MainGreen
+import com.example.jewerlyproducts.ui.theme.MainLight
 import com.example.jewerlyproducts.ui.theme.Purple40
+import com.example.jewerlyproducts.ui.theme.RudeRed
+import com.example.jewerlyproducts.ui.theme.SecondLight
 import java.text.NumberFormat
 import java.util.Locale
 
@@ -96,7 +101,7 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
     }
 
     ScreenBackgroundComponent(innerPadding) {
-        FirstTitleItem("Inicio")
+        FirstTitleItem("Inicio", color = SecondLight)
         BalanceCardItem(totalSells, totalExpenses) {
             showClearBalanceDialog = true
         }
@@ -131,7 +136,6 @@ fun HomeScreen(innerPadding: PaddingValues, viewModel: HomeViewModel = hiltViewM
     }
     DialogWithListAndQuantitySell(
         show = showSellDialog,
-        title = "Agregar Venta",
         itemList = productList,
         quantitySell = quantitySell,
         onQuantitySellChange = {
@@ -214,9 +218,10 @@ fun ExpensesDialog(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
-            shape = RoundedCornerShape(4.dp)
+            shape = RoundedCornerShape(4.dp),
+            border = BorderStroke(1.dp, MainColor)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -224,7 +229,7 @@ fun ExpensesDialog(
             ) {
                 Column {
                     SecondTitleItem("Agregar Gasto")
-                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                    HorizontalDivider(thickness = 2.dp, color = MainLight)
                 }
                 SingleLineTextFieldItem(
                     value = description,
@@ -271,9 +276,10 @@ fun ExpensesDialogEdit(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
-            shape = RoundedCornerShape(4.dp)
+            shape = RoundedCornerShape(4.dp),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -281,7 +287,7 @@ fun ExpensesDialogEdit(
             ) {
                 Column {
                     SecondTitleItem("Modificar Gasto")
-                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
                 }
                 SingleLineTextFieldItem(
                     value = description,
@@ -296,7 +302,7 @@ fun ExpensesDialogEdit(
                 AcceptDeclineButtons(
                     acceptText = "Modificar",
                     declineText = "Borrar",
-                    declineColor = Color.Red.copy(alpha = .6f),
+                    declineColor = RudeRed,
                     onAccept = {
                         onModifyExpense(
                             ExpenseDataClass(
@@ -331,7 +337,7 @@ fun HomeFabItem(
             bottom = innerPadding.calculateBottomPadding() + 16.dp,
             end = 8.dp
         ),
-        containerColor = Color.Magenta,
+        containerColor = AccentColor,
         contentColor = Color.White
 
     ) {
@@ -362,7 +368,7 @@ fun DropdownMenuHomeItem(
         expanded = expandedValue,
         onDismissRequest = { onDismiss() },
         offset = DpOffset((-34).dp, 0.dp),
-        modifier = Modifier.background(Color.Magenta)
+        modifier = Modifier.background(AccentColor)
     ) {
         DropdownMenuItem(
             text = { Text("Agregar venta") },
@@ -395,7 +401,7 @@ private fun ExpensesCardItem(
             .height(250.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Purple40
+            containerColor = MainColor
         )
     ) {
         Column(
@@ -408,18 +414,18 @@ private fun ExpensesCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FirstTitleItem("Gastos")
+                FirstTitleItem("Gastos", color = MainLight)
 
                 SmallButtonText(
                     text = "Limpiar",
-                    color = Pink40,
+                    color = AccentColor,
                     onClick = { onClearExpenses() }
                 )
             }
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
-                color = Color.White
+                color = SecondLight
             )
             Spacer(Modifier.size(4.dp))
         }
@@ -506,7 +512,7 @@ private fun SellsCardItem(
             .height(250.dp),
         shape = RoundedCornerShape(8.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Purple40
+            containerColor = MainColor
         )
     ) {
         Column(
@@ -519,17 +525,17 @@ private fun SellsCardItem(
                 verticalAlignment = Alignment.CenterVertically,
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
-                FirstTitleItem("Ventas")
+                FirstTitleItem("Ventas", color = MainLight)
                 SmallButtonText(
                     text = "Limpiar",
-                    color = Pink40,
+                    color = AccentColor,
                     onClick = { onClearSell() }
                 )
             }
             HorizontalDivider(
                 Modifier.fillMaxWidth(),
                 thickness = 2.dp,
-                color = Color.White
+                color = SecondLight
             )
             Spacer(Modifier.size(4.dp))
         }
@@ -584,6 +590,7 @@ private fun SellsCardItem(
             onAccept = {
                 onDelete(sellId)
                 showConfirmDeleteDialog = false
+                showEditSell = false
             },
             onDismiss = {
                 showConfirmDeleteDialog = false
@@ -608,8 +615,9 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
                 .fillMaxWidth(),
             shape = RoundedCornerShape(8.dp),
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
-            )
+                containerColor = MainColor
+            ),
+            
         ) {
 
 
@@ -625,17 +633,17 @@ fun BalanceCardItem(totalSells: Int, totalExpenses: Int, onClearBalance: () -> U
                         verticalAlignment = Alignment.CenterVertically,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        FirstTitleItem("Balance")
+                        FirstTitleItem("Balance", color = MainLight)
                         SmallButtonText(
                             text = "Limpiar",
-                            color = Pink40,
+                            color = AccentColor,
                             onClick = { onClearBalance() }
                         )
                     }
                     HorizontalDivider(
                         Modifier.fillMaxWidth(),
                         thickness = 2.dp,
-                        color = Color.White
+                        color = SecondLight
                     )
                     Spacer(Modifier.size(4.dp))
                 }
@@ -692,7 +700,6 @@ private fun getSellValue(sellValue: Int, quantity: Int): Int = sellValue * quant
 @Composable
 private fun DialogWithListAndQuantitySell(
     show: Boolean,
-    title: String,
     itemList: List<ProductsDataClass>,
     quantitySell: String,
     onQuantitySellChange: (String) -> Unit,
@@ -717,20 +724,21 @@ private fun DialogWithListAndQuantitySell(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 Column {
-                    SecondTitleItem(title)
-                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                    SecondTitleItem("Agregar venta")
+                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
                 }
                 TextFieldWithDropdownMenu(itemList, "Seleccionar..", articleName) { item ->
                     when (item) {
@@ -747,6 +755,7 @@ private fun DialogWithListAndQuantitySell(
                 AcceptDeclineButtons(
                     acceptText = "Agregar",
                     declineText = "Cancelar",
+                    acceptColor = MainGreen,
                     onAccept = {
                         onAccept(productSelected.value, quantitySell.toInt())
                         onDismiss()
@@ -778,12 +787,13 @@ private fun DialogWithListAndQuantitySellEdit(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -791,7 +801,7 @@ private fun DialogWithListAndQuantitySellEdit(
             ) {
                 Column {
                     SecondTitleItem("Modificar Venta")
-                    HorizontalDivider(thickness = 2.dp, color = Color.White)
+                    HorizontalDivider(thickness = 2.dp, color = SecondLight)
                 }
                 TextField(
                     value = articleName,
@@ -818,7 +828,8 @@ private fun DialogWithListAndQuantitySellEdit(
                 AcceptDeclineButtons(
                     acceptText = "Modificar",
                     declineText = "Borrar",
-                    declineColor = Color.Red.copy(alpha = .6f),
+                    declineColor = RudeRed,
+                    acceptColor = MainGreen,
                     onAccept = {
                         onAccept(item, quantitySell.toInt())
                         onDismiss()
@@ -843,8 +854,8 @@ fun formatToPrice(number: Int): String {
 
 fun getBalanceColor(balance: Int): Color {
     return if (balance > 0) {
-        Color.Green
+        MainLight
     } else if (balance < 0) {
-        Color.Red
-    } else Color.DarkGray
+        RudeRed
+    } else MainLight
 }
