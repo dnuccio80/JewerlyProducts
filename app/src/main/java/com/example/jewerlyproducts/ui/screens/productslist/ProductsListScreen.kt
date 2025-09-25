@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.productslist
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -18,6 +19,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
@@ -32,6 +34,11 @@ import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
 import com.example.jewerlyproducts.ui.theme.Purple40
 import androidx.core.net.toUri
 import com.example.jewerlyproducts.R
+import com.example.jewerlyproducts.ui.generalfuns.getRandomColor
+import com.example.jewerlyproducts.ui.theme.LightBrownCard
+import com.example.jewerlyproducts.ui.theme.MainColor
+import com.example.jewerlyproducts.ui.theme.MainLight
+import com.example.jewerlyproducts.ui.theme.SecondLightCard
 
 @Composable
 fun ProductsListScreen(
@@ -77,9 +84,10 @@ fun ProductItem(product: ProductsDataClass, onNavigateToDetails: () -> Unit) {
                 onNavigateToDetails()
             },
         colors = CardDefaults.cardColors(
-            containerColor = Purple40.copy(alpha = 1f)
+            containerColor = getRandomColor()
         ),
-        elevation = CardDefaults.cardElevation(16.dp)
+        elevation = CardDefaults.cardElevation(16.dp),
+        border = BorderStroke(0.5.dp, MainLight)
     ) {
         Row(
             Modifier
@@ -106,3 +114,4 @@ fun ProductItem(product: ProductsDataClass, onNavigateToDetails: () -> Unit) {
         }
     }
 }
+

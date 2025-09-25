@@ -104,7 +104,7 @@ fun FloatingButton(innerPadding: PaddingValues, onClick: () -> Unit) {
     ) {
         FloatingActionButton(
             onClick = { onClick() },
-            containerColor = Color.Magenta,
+            containerColor = AccentColor,
             contentColor = Color.White
         ) {
             Icon(Icons.Filled.Add, contentDescription = "Add button", tint = Color.White)

@@ -1,5 +1,6 @@
 package com.example.jewerlyproducts.ui.screens.materialslist
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -30,7 +31,12 @@ import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.FloatingButton
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
+import com.example.jewerlyproducts.ui.generalfuns.getRandomColor
+import com.example.jewerlyproducts.ui.theme.LightBrownCard
+import com.example.jewerlyproducts.ui.theme.MainColor
+import com.example.jewerlyproducts.ui.theme.MainLight
 import com.example.jewerlyproducts.ui.theme.Purple40
+import com.example.jewerlyproducts.ui.theme.SecondLightCard
 
 @Composable
 fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, onNavigateToMaterialDetails:(String) -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
@@ -101,8 +107,9 @@ fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, onClick:() -> 
         ,
         shape = RoundedCornerShape(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = Purple40
-        )
+            containerColor = getRandomColor()
+        ),
+        border = BorderStroke(0.5.dp, MainLight)
     ) {
         Column(
             modifier = Modifier
@@ -119,3 +126,5 @@ fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, onClick:() -> 
         }
     }
 }
+
+
