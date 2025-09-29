@@ -5,6 +5,7 @@ import android.net.Uri
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
 import androidx.activity.result.contract.ActivityResultContracts
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -64,7 +65,11 @@ import com.example.jewerlyproducts.ui.dataclasses.MaterialInProductWithQuantityD
 import com.example.jewerlyproducts.ui.dataclasses.MaterialsDataClass
 import com.example.jewerlyproducts.ui.dataclasses.MaterialsSaver
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
+import com.example.jewerlyproducts.ui.theme.AccentColor
+import com.example.jewerlyproducts.ui.theme.MainGreen
+import com.example.jewerlyproducts.ui.theme.MainLight
 import com.example.jewerlyproducts.ui.theme.Purple40
+import com.example.jewerlyproducts.ui.theme.RudeRed
 import kotlin.math.ceil
 
 @Composable
@@ -304,12 +309,13 @@ fun EditMaterialInProductDialog(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -332,6 +338,7 @@ fun EditMaterialInProductDialog(
                 AcceptDeclineButtons(
                     acceptText = "Agregar",
                     declineText = "Cancelar",
+                    acceptColor = MainGreen,
                     onAccept = {
                         onAccept()
                         onDismiss()
@@ -340,7 +347,7 @@ fun EditMaterialInProductDialog(
                     enabled = (quantity != 0 && quantity.toString().isNotBlank())
                 )
                 Box(modifier = Modifier.fillMaxWidth(), contentAlignment = Alignment.Center) {
-                    SimpleButtonText("Eliminar Material", Color.Red) {
+                    SimpleButtonText("Eliminar Material", RudeRed) {
                         showConfirmDialog = true
                     }
                 }

@@ -78,7 +78,7 @@ fun ProductDetailsScreen(
     val context = LocalContext.current
 
     val productDetails by viewModel.productDetails.collectAsState()
-//    val productName by viewModel.productName.collectAsState()
+//    val editableProductName by viewModel.productName.collectAsState()
     val showMaterialDialog by viewModel.showMaterialDialog.collectAsState()
     val costValue by viewModel.costValue.collectAsState()
     val sellValue by viewModel.sellValue.collectAsState()
@@ -144,8 +144,9 @@ fun ProductDetailsScreen(
                 }
                 SingleLineTextFieldItem(
                     value = productName,
-                    label = "Nombre del producto"
-                ) { viewModel.updateProductName(it) }
+                    label = "Nombre del producto",
+                    enabled = false
+                ) { }
                 Row(
                     modifier = Modifier.fillMaxWidth(),
                     verticalAlignment = Alignment.CenterVertically,

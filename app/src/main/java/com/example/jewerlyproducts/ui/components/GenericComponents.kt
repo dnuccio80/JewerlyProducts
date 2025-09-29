@@ -372,12 +372,13 @@ fun DialogWithListAndQuantity(
     ) {
         Card(
             colors = CardDefaults.cardColors(
-                containerColor = Purple40
+                containerColor = AccentColor
             ),
             shape = RoundedCornerShape(4.dp),
             modifier = Modifier
                 .fillMaxWidth()
-                .padding(16.dp)
+                .padding(16.dp),
+            border = BorderStroke(1.dp, MainLight)
         ) {
             Column(
                 modifier = Modifier.padding(16.dp),
@@ -402,6 +403,7 @@ fun DialogWithListAndQuantity(
                 AcceptDeclineButtons(
                     acceptText = "Agregar",
                     declineText = "Cancelar",
+                    acceptColor = MainGreen,
                     onAccept = {
                         onAccept(materialSelected.value, quantitySell.toInt())
                         onDismiss()

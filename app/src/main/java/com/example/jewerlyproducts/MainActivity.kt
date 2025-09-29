@@ -70,33 +70,39 @@ class MainActivity : ComponentActivity() {
                         BottomBar(currentTarget) { action ->
                             when (action) {
                                 BottomBarNavAction.HOME -> {
-                                    mainNav.navigate(Routes.Home.routes) {
-                                        popUpTo(mainNav.graph.startDestinationId) {
-                                            saveState = true
+                                    if (currentRoute != Routes.Home.routes) {
+                                        mainNav.navigate(Routes.Home.routes) {
+                                            popUpTo(mainNav.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
 
                                 BottomBarNavAction.PRODUCTS -> {
-                                    mainNav.navigate(Routes.ProductList.routes) {
-                                        popUpTo(mainNav.graph.startDestinationId) {
-                                            saveState = true
-                                        }
-                                        launchSingleTop = true
-                                        restoreState = true
+                                    if (currentRoute != Routes.ProductList.routes) {
+                                        mainNav.navigate(Routes.ProductList.routes) {
+                                            popUpTo(mainNav.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
 
+                                        }
                                     }
                                 }
 
                                 BottomBarNavAction.MATERIALS -> {
-                                    mainNav.navigate(Routes.MaterialList.routes) {
-                                        popUpTo(mainNav.graph.startDestinationId) {
-                                            saveState = true
+                                    if (currentRoute != Routes.MaterialList.routes) {
+                                        mainNav.navigate(Routes.MaterialList.routes) {
+                                            popUpTo(mainNav.graph.startDestinationId) {
+                                                saveState = true
+                                            }
+                                            launchSingleTop = true
+                                            restoreState = true
                                         }
-                                        launchSingleTop = true
-                                        restoreState = true
                                     }
                                 }
                             }
@@ -154,7 +160,8 @@ class MainActivity : ComponentActivity() {
                         ) { navBackStackEntry ->
                             MaterialDetailsScreen(
                                 innerPadding = innerPadding,
-                                materialName = navBackStackEntry.arguments?.getString("materialName").orEmpty(),
+                                materialName = navBackStackEntry.arguments?.getString("materialName")
+                                    .orEmpty(),
                                 onDismiss = { mainNav.popBackStack() }
                             )
                         }
@@ -166,7 +173,8 @@ class MainActivity : ComponentActivity() {
                         ) { navBackStackEntry ->
                             ProductDetailsScreen(
                                 innerPadding = innerPadding,
-                                productName = navBackStackEntry.arguments?.getString("productName").orEmpty(),
+                                productName = navBackStackEntry.arguments?.getString("productName")
+                                    .orEmpty(),
                             ) { mainNav.popBackStack() }
                         }
                     }

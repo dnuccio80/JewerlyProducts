@@ -31,12 +31,8 @@ import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.FloatingButton
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
-import com.example.jewerlyproducts.ui.generalfuns.getRandomColor
-import com.example.jewerlyproducts.ui.theme.LightBrownCard
-import com.example.jewerlyproducts.ui.theme.MainColor
+import com.example.jewerlyproducts.ui.generalfuns.getListColor
 import com.example.jewerlyproducts.ui.theme.MainLight
-import com.example.jewerlyproducts.ui.theme.Purple40
-import com.example.jewerlyproducts.ui.theme.SecondLightCard
 
 @Composable
 fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:() -> Unit, onNavigateToMaterialDetails:(String) -> Unit, viewModel: MaterialsListViewModel = hiltViewModel()) {
@@ -77,14 +73,15 @@ fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:(
             verticalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             if(materialsList.isNotEmpty()) {
-                materialsList.forEach {material ->
+                materialsList.forEachIndexed {index, material ->
                     MaterialItem(
                         name = material.materialName,
                         unitPrice = viewModel.getUnitPrice(
                             packValue = material.pricePerPack,
                             quantityPerPack = material.quantityPerPack
                         ),
-                        quantityPerPack = material.quantityPerPack
+                        quantityPerPack = material.quantityPerPack,
+                        index = index
                     ) {
                         onNavigateToMaterialDetails(material.materialName)
                     }
@@ -99,7 +96,7 @@ fun MaterialsListScreen(innerPadding: PaddingValues,onNavigateToAddNewMaterial:(
 }
 
 @Composable
-fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, onClick:() -> Unit) {
+fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, index:Int, onClick:() -> Unit) {
     Card(
         modifier = Modifier
             .fillMaxWidth()
@@ -107,7 +104,7 @@ fun MaterialItem(name:String, unitPrice:Int, quantityPerPack:Int, onClick:() -> 
         ,
         shape = RoundedCornerShape(4.dp),
         colors = CardDefaults.cardColors(
-            containerColor = getRandomColor()
+            containerColor = getListColor(index)
         ),
         border = BorderStroke(0.5.dp, MainLight)
     ) {

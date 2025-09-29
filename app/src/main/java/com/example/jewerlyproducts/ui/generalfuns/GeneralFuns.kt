@@ -5,11 +5,10 @@ import com.example.jewerlyproducts.ui.theme.LightBrownCard
 import com.example.jewerlyproducts.ui.theme.MainColor
 import com.example.jewerlyproducts.ui.theme.SecondLightCard
 
-fun getRandomColor(): Color {
+fun getListColor(index: Int): Color {
     val colorList = listOf(
         MainColor, LightBrownCard, SecondLightCard
     )
-    val randomIndex = (0..2).random()
-    return colorList[randomIndex]
+    return colorList[index % colorList.size]
 
 }

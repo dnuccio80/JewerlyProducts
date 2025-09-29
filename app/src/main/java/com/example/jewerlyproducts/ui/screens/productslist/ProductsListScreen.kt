@@ -19,26 +19,21 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
+import androidx.core.net.toUri
 import androidx.hilt.navigation.compose.hiltViewModel
 import coil.compose.AsyncImage
+import com.example.jewerlyproducts.R
 import com.example.jewerlyproducts.ui.components.BodyText
 import com.example.jewerlyproducts.ui.components.FirstTitleItem
 import com.example.jewerlyproducts.ui.components.FloatingButton
 import com.example.jewerlyproducts.ui.components.ScreenBackgroundComponent
 import com.example.jewerlyproducts.ui.components.SecondTitleItem
 import com.example.jewerlyproducts.ui.dataclasses.ProductsDataClass
-import com.example.jewerlyproducts.ui.theme.Purple40
-import androidx.core.net.toUri
-import com.example.jewerlyproducts.R
-import com.example.jewerlyproducts.ui.generalfuns.getRandomColor
-import com.example.jewerlyproducts.ui.theme.LightBrownCard
-import com.example.jewerlyproducts.ui.theme.MainColor
+import com.example.jewerlyproducts.ui.generalfuns.getListColor
 import com.example.jewerlyproducts.ui.theme.MainLight
-import com.example.jewerlyproducts.ui.theme.SecondLightCard
 
 @Composable
 fun ProductsListScreen(
@@ -64,8 +59,8 @@ fun ProductsListScreen(
             if (productsList.isEmpty()) {
                 SecondTitleItem("No hay nada para mostrar")
             } else {
-                productsList.forEach { product ->
-                    ProductItem(product) { onNavigateToDetails(product.productName) }
+                productsList.forEachIndexed {index, product ->
+                    ProductItem(product,index) { onNavigateToDetails(product.productName) }
                 }
             }
         }
@@ -75,7 +70,7 @@ fun ProductsListScreen(
 
 
 @Composable
-fun ProductItem(product: ProductsDataClass, onNavigateToDetails: () -> Unit) {
+fun ProductItem(product: ProductsDataClass, index:Int, onNavigateToDetails: () -> Unit) {
     Card(
         shape = RoundedCornerShape(8.dp),
         modifier = Modifier
@@ -84,7 +79,7 @@ fun ProductItem(product: ProductsDataClass, onNavigateToDetails: () -> Unit) {
                 onNavigateToDetails()
             },
         colors = CardDefaults.cardColors(
-            containerColor = getRandomColor()
+            containerColor = getListColor(index)
         ),
         elevation = CardDefaults.cardElevation(16.dp),
         border = BorderStroke(0.5.dp, MainLight)
